@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DealMatcher — AI Deal Flow for Investors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#050710;--s1:rgba(12,15,28,0.95);--s2:rgba(18,22,38,0.9);--bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.1);--teal:#34d399;--teal2:#059669;--tealGlow:rgba(52,211,153,0.15);--t1:#f0f2f8;--t2:#7c8599;--t3:#3d4560;--ti:#050710;--sans:'Instrument Sans',system-ui,sans-serif;--serif:'Fraunces',serif}
+html{scroll-behavior:smooth}body{font-family:var(--sans);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden}a{color:var(--teal);text-decoration:none}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,7,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.nav-logo{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--teal)}.nav-links{display:flex;gap:24px;align-items:center}.nav-link{font-size:13px;color:var(--t2);font-weight:500}.nav-link:hover{color:var(--t1)}.nav-cta{padding:8px 20px;border-radius:999px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--ti);font-size:13px;font-weight:700;border:none;cursor:pointer}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,var(--tealGlow),transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15);font-size:12px;font-weight:600;color:var(--teal);margin-bottom:28px}
+.hero-badge span{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s ease infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{font-family:var(--serif);font-size:clamp(38px,6vw,72px);font-weight:900;line-height:1.05;letter-spacing:-0.03em;max-width:800px;margin-bottom:20px}.hero h1 em{font-style:normal;color:var(--teal)}
+.hero p{font-size:18px;color:var(--t2);max-width:540px;line-height:1.7;margin-bottom:36px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{padding:14px 28px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s}.btn:active{transform:scale(0.97)}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--ti);box-shadow:0 8px 30px rgba(52,211,153,0.25)}
+.btn-secondary{background:var(--s2);border:1px solid var(--bd2);color:var(--t2)}.btn-secondary:hover{color:var(--t1);border-color:var(--teal)}
+.stats-bar{display:flex;justify-content:center;gap:48px;padding:40px 24px;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);background:var(--s1)}
+.stat-item{text-align:center}.stat-num{font-family:var(--serif);font-size:32px;font-weight:700;color:var(--teal)}.stat-label{font-size:12px;color:var(--t3);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600}
+.section{padding:80px 24px;max-width:1100px;margin:0 auto}.section-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;text-align:center}
+.section-title{font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:700;text-align:center;letter-spacing:-0.02em;margin-bottom:48px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:32px 24px;text-align:center;transition:border-color 0.2s}.step:hover{border-color:rgba(52,211,153,0.2)}
+.step-num{font-family:var(--serif);font-size:48px;font-weight:900;color:rgba(52,211,153,0.15);margin-bottom:12px}.step-title{font-size:16px;font-weight:700;margin-bottom:8px}.step-desc{font-size:13px;color:var(--t2);line-height:1.65}
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:960px;margin:0 auto}
+.price-card{background:var(--s1);border:1px solid var(--bd);border-radius:24px;padding:32px 24px;display:flex;flex-direction:column}
+.price-card.featured{border-color:rgba(52,211,153,0.3);background:linear-gradient(180deg,rgba(52,211,153,0.06),transparent);position:relative}
+.price-card.featured::before{content:'MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--teal);color:var(--ti);font-size:10px;font-weight:800;padding:4px 14px;border-radius:999px;letter-spacing:0.06em}
+.price-name{font-size:14px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+.price-amount{font-family:var(--serif);font-size:42px;font-weight:900;margin-bottom:4px}.price-amount span{font-size:16px;color:var(--t3);font-weight:400;font-family:var(--sans)}
+.price-desc{font-size:13px;color:var(--t3);margin-bottom:20px;line-height:1.5}
+.price-features{list-style:none;margin-bottom:24px;flex:1}.price-features li{padding:8px 0;font-size:13px;color:var(--t2);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}.price-features li::before{content:'✓';color:var(--teal);font-weight:700}
+.price-btn{width:100%;padding:12px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;border:none;text-align:center;display:block}
+.price-btn.primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--ti)}.price-btn.ghost{background:var(--s2);border:1px solid var(--bd2);color:var(--t2)}
+.form-section{padding:80px 24px;background:var(--s1);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)}
+.form-wrap{max-width:560px;margin:0 auto}.form-wrap h2{font-family:var(--serif);font-size:28px;font-weight:700;text-align:center;margin-bottom:8px}
+.form-wrap>p{text-align:center;color:var(--t2);font-size:14px;margin-bottom:28px}
+.form-grid{display:grid;gap:14px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.f-group label{display:block;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.f-group input,.f-group select{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--t1);outline:none;font-family:var(--sans)}
+.f-group input:focus{border-color:rgba(52,211,153,0.3)}
+.form-submit{width:100%;padding:14px;border-radius:999px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--ti);font-size:15px;font-weight:700;border:none;cursor:pointer;margin-top:8px}
+.form-note{text-align:center;font-size:11px;color:var(--t3);margin-top:12px}
+.form-success{display:none;text-align:center;padding:32px}
+.footer{padding:40px 24px;text-align:center;font-size:12px;color:var(--t3);border-top:1px solid var(--bd)}
+@media(max-width:768px){.nav-links{display:none}.steps,.pricing{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.stats-bar{flex-wrap:wrap;gap:24px}}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-logo">DealMatcher</div><div class="nav-links"><a href="#how" class="nav-link">How It Works</a><a href="#pricing" class="nav-link">Pricing</a><a href="#signup" class="nav-cta">Get Started Free</a></div></nav>
+<section class="hero">
+<div class="hero-badge"><span></span> AI-Powered Deal Matching</div>
+<h1>Stop Searching.<br/><em>Start Closing.</em></h1>
+<p>AI finds businesses for sale, scores them against your exact buying criteria, and delivers your best matches every week. You focus on closing.</p>
+<div class="hero-cta"><a href="#signup" class="btn btn-primary">Get Matched Free</a><a href="#how" class="btn btn-secondary">See How It Works</a></div>
+</section>
+<div class="stats-bar">
+<div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Deals Scanned Weekly</div></div>
+<div class="stat-item"><div class="stat-num">92%</div><div class="stat-label">Match Accuracy</div></div>
+<div class="stat-item"><div class="stat-num">$2.4B</div><div class="stat-label">Deal Flow Tracked</div></div>
+<div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">AI Monitoring</div></div>
+</div>
+<section class="section" id="how">
+<div class="section-label">How It Works</div>
+<div class="section-title">Three steps between you and your next deal</div>
+<div class="steps">
+<div class="step"><div class="step-num">01</div><div class="step-title">Tell Us What You Buy</div><div class="step-desc">Industry, location, price range, revenue targets. We build your investor profile in 60 seconds.</div></div>
+<div class="step"><div class="step-num">02</div><div class="step-title">AI Scans Every Listing</div><div class="step-desc">Our engine scans BizBuySell, Crexi, LoopNet, and off-market sources daily. Every listing gets scored against your criteria.</div></div>
+<div class="step"><div class="step-num">03</div><div class="step-title">Get Matched Deals Delivered</div><div class="step-desc">Your top matches arrive in your inbox every Monday. Score, location, price, revenue, and why it fits.</div></div>
+</div>
+</section>
+<section class="section" id="pricing" style="padding-top:40px">
+<div class="section-label">Pricing</div>
+<div class="section-title">Built for serious buyers</div>
+<div class="pricing">
+<div class="price-card">
+<div class="price-name">Starter</div><div class="price-amount">Free</div><div class="price-desc">Test the engine with zero risk</div>
+<ul class="price-features"><li>3 matched deals per week</li><li>Weekly email digest</li><li>1 investor profile</li><li>Basic deal details</li></ul>
+<a href="#signup" class="price-btn ghost">Start Free</a>
+</div>
+<div class="price-card featured">
+<div class="price-name">Pro</div><div class="price-amount">$49<span>/mo</span></div><div class="price-desc">Full deal flow for active buyers</div>
+<ul class="price-features"><li>Unlimited matched deals</li><li>Daily email alerts</li><li>5 investor profiles</li><li>Full deal details + comps</li><li>Match score breakdown</li><li>Priority new listings</li></ul>
+<a href="#signup" class="price-btn primary">Get Pro Access</a>
+</div>
+<div class="price-card">
+<div class="price-name">Enterprise</div><div class="price-amount">$199<span>/mo</span></div><div class="price-desc">For funds and acquisition teams</div>
+<ul class="price-features"><li>Everything in Pro</li><li>Unlimited profiles</li><li>API access</li><li>Off-market deal alerts</li><li>Direct intro requests</li><li>Custom deal criteria</li></ul>
+<a href="#signup" class="price-btn ghost">Contact Us</a>
+</div>
+</div>
+</section>
+<section class="form-section" id="signup">
+<div class="form-wrap">
+<h2>Get Your First Matches</h2>
+<p>Tell us what you're looking for. Free tier — no credit card required.</p>
+<form id="signupForm" class="form-grid" onsubmit="return handleSignup(event)">
+<div class="form-row"><div class="f-group"><label>Full Name</label><input id="subName" placeholder="John Smith" required/></div><div class="f-group"><label>Email</label><input id="subEmail" type="email" placeholder="john@firm.com" required/></div></div>
+<div class="form-row"><div class="f-group"><label>Company / Fund</label><input id="subCompany" placeholder="Your firm name"/></div><div class="f-group"><label>Phone</label><input id="subPhone" placeholder="210-555-1234"/></div></div>
+<div class="f-group"><label>Target Industries</label><input id="subIndustries" placeholder="Healthcare, Restaurant, Retail, Manufacturing..." required/></div>
+<div class="form-row"><div class="f-group"><label>Target Locations</label><input id="subLocations" placeholder="Florida, Texas, Nationwide..." required/></div><div class="f-group"><label>Plan</label><select id="subPlan"><option value="free">Free — 3 matches/week</option><option value="pro">Pro $49/mo</option><option value="enterprise">Enterprise $199/mo</option></select></div></div>
+<div class="form-row"><div class="f-group"><label>Min Price ($)</label><input id="subMinPrice" type="number" placeholder="200000"/></div><div class="f-group"><label>Max Price ($)</label><input id="subMaxPrice" type="number" placeholder="5000000"/></div></div>
+<div class="f-group" style="margin-top:8px"><label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;color:var(--t2);text-transform:none;letter-spacing:0"><input type="checkbox" id="subAgree" required style="margin-top:3px;width:16px;height:16px;accent-color:var(--teal)"/>I agree to the <a href="/terms.html" target="_blank" style="color:var(--teal)">Terms of Service</a> including the 2% facilitation fee on closed transactions, KYC/AML compliance requirements, and proof of funds verification.</label></div><button type="submit" class="form-submit">Get Matched — Free</button>
+<div class="form-note">No credit card required for free tier. Upgrade anytime.<br/>By signing up you agree to our <a href="/terms.html" target="_blank">Terms of Service</a> including the 2% facilitation fee on closed transactions.</div>
+</form>
+<div class="form-success" id="formSuccess"><div style="font-size:40px;margin-bottom:16px">✓</div><div style="font-family:var(--serif);font-size:24px;margin-bottom:8px">You're in.</div><div style="color:var(--t2)">Your first matched deals will arrive within 24 hours.</div></div>
+</div>
+</section>
+<footer class="footer">DealMatcher — AI-Powered Deal Flow for Investors</footer>
+<script>
+async function handleSignup(e){e.preventDefault();const d={name:document.getElementById('subName').value.trim(),email:document.getElementById('subEmail').value.trim(),company:document.getElementById('subCompany').value.trim(),phone:document.getElementById('subPhone').value.trim(),industries:document.getElementById('subIndustries').value.trim(),locations:document.getElementById('subLocations').value.trim(),plan:document.getElementById('subPlan').value,min_price:document.getElementById('subMinPrice').value||null,max_price:document.getElementById('subMaxPrice').value||null};try{const r=await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});if(r.ok){document.getElementById('signupForm').style.display='none';document.getElementById('formSuccess').style.display='block'}else{const err=await r.json();alert(err.error||'Something went wrong.')}}catch(err){alert('Connection error.')}return false}
+</script>
+</body>
+</html>
