@@ -8,7 +8,7 @@ const { runMatchingForAll } = require('../matcher/engine');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const SUBS_FILE = path.join(__dirname, '..', 'data', 'subscribers.json');
-const J_EMAIL = 'globalhealthagent@gmail.com';
+const J_EMAIL = 'fields@dealmatcherapp.com';
 
 function loadSubs() {
   try {
@@ -106,7 +106,7 @@ async function welcomeEmail(sub) {
           <p>1️⃣ Our engine scans 500+ active deals daily</p>
           <p>2️⃣ You'll receive your top matched deals every week</p>
           <p>3️⃣ When you're ready to pursue a deal, we handle introductions</p>
-          <p style="margin-top:20px;">Questions? Reply to this email or contact us at <a href="mailto:globalhealthagent@gmail.com" style="color:#00d4aa;">globalhealthagent@gmail.com</a></p>
+          <p style="margin-top:20px;">Questions? Reply to this email or contact us at <a href="mailto:fields@dealmatcherapp.com" style="color:#00d4aa;">fields@dealmatcherapp.com</a></p>
           <hr style="border-color:#333;margin:20px 0;">
           <p style="color:#888;font-size:12px;">DealMatcher • AI-Powered Deal Matching • San Antonio, TX</p>
         </div>

@@ -11,6 +11,7 @@ const adminRoutes = require('./routes/admin');
 const outreachRoutes = require('./routes/outreach');
 const subscribeRoutes = require('./routes/subscribe');
 const { router: authRouter, requireAuth } = require('./routes/auth');
+const { router: digestRouter, sendDigestForAll } = require('./routes/digest');
 const { runMatchingForAll } = require('./matcher/engine');
 
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/investors', requireAuth, investorsRoutes);
 app.use('/api/matches', requireAuth, matchesRoutes);
 app.use('/api/admin', requireAuth, adminRoutes);
 app.use('/api/outreach', requireAuth, outreachRoutes);
+app.use('/api/digest', requireAuth, digestRouter);
 
 // Daily matching cron
 const schedule = process.env.CRON_SCHEDULE || '0 7 * * *';
@@ -53,6 +55,17 @@ cron.schedule(schedule, async () => {
     console.log('[CRON] Done.');
   } catch (e) {
     console.error('[CRON] Failed:', e.message);
+  }
+});
+
+// Weekly digest email - Monday 8am CST (13:00 UTC)
+cron.schedule('0 13 * * 1', async () => {
+  console.log('[CRON] Sending weekly digest');
+  try {
+    const result = await sendDigestForAll();
+    console.log('[CRON] Digest done:', result);
+  } catch (e) {
+    console.error('[CRON] Digest failed:', e.message);
   }
 });
 
