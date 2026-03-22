@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealMatcher — Lead Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Fraunces:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Instrument Sans',system-ui,sans-serif;background:#060810;color:#f0f2f8;min-height:100vh}
+a{color:#34d399;text-decoration:none}
+.header{background:rgba(8,10,18,0.98);border-bottom:1px solid rgba(255,255,255,0.06);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.header h1{font-size:20px;font-weight:700;font-family:'Fraunces',serif}
+.header h1 span{color:#34d399}
+.back-link{color:#7c8599;font-size:13px;margin-right:16px}
+.header-actions{display:flex;gap:8px}
+.btn{padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.btn:active{transform:scale(0.96)}
+.btn-primary{background:linear-gradient(135deg,#34d399,#059669);color:#060810}
+.btn-secondary{background:rgba(20,24,40,0.88);color:#7c8599;border:1px solid rgba(255,255,255,0.1)}
+.btn-secondary:hover{color:#f0f2f8}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;padding:20px 24px}
+.stat-card{background:rgba(14,17,28,0.92);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:18px;text-align:center}
+.stat-number{font-size:28px;font-weight:700;color:#34d399;font-family:'Fraunces',serif;letter-spacing:-0.02em}
+.stat-label{font-size:10px;color:#3d4560;margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;font-weight:700}
+.content{padding:0 24px 24px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-btn{padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.06);background:rgba(14,17,28,0.92);color:#7c8599;transition:all 0.15s}
+.filter-btn.active{background:rgba(52,211,153,0.1);color:#34d399;border-color:rgba(52,211,153,0.3)}
+.lead-card{background:rgba(14,17,28,0.92);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:16px;margin-bottom:8px;cursor:pointer;transition:all 0.15s}
+.lead-card:hover{border-color:rgba(52,211,153,0.3);transform:translateY(-1px)}
+.lead-card.hot{border-left:3px solid #ef4444}
+.lead-card.high{border-left:3px solid #f59e0b}
+.lead-card.medium{border-left:3px solid #34d399}
+.lead-card.low{border-left:3px solid #3d4560}
+.lead-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.lead-name{font-weight:700;font-size:15px;color:#f0f2f8}
+.lead-company{font-size:12px;color:#7c8599}
+.lead-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
+.badge-hot{background:rgba(239,68,68,0.1);color:#ef4444}
+.badge-high{background:rgba(245,158,11,0.1);color:#f59e0b}
+.badge-medium{background:rgba(52,211,153,0.1);color:#34d399}
+.badge-low,.badge-cold{background:rgba(255,255,255,0.05);color:#7c8599}
+.badge-new{background:rgba(59,130,246,0.1);color:#3b82f6}
+.badge-contacted{background:rgba(139,92,246,0.1);color:#8b5cf6}
+.badge-qualified{background:rgba(52,211,153,0.1);color:#34d399}
+.badge-negotiating,.badge-active{background:rgba(245,158,11,0.1);color:#f59e0b}
+.badge-closed_won{background:rgba(16,185,129,0.2);color:#10b981}
+.badge-closed_lost,.badge-dead{background:rgba(239,68,68,0.1);color:#ef4444}
+.badge-verified{background:rgba(52,211,153,0.15);color:#34d399}
+.score-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;width:60px;display:inline-block;vertical-align:middle;margin-left:6px}
+.score-fill{height:100%;background:#34d399;border-radius:2px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:rgba(10,12,22,0.99);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;width:90%;max-width:600px;max-height:85vh;overflow-y:auto}
+.modal h2{font-size:20px;font-family:'Fraunces',serif;font-weight:700;margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:10px;color:#3d4560;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
+.form-input{width:100%;padding:10px 12px;background:rgba(20,24,40,0.88);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#f0f2f8;font-size:14px;font-family:inherit}
+.form-input:focus{outline:none;border-color:rgba(52,211,153,0.3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+select.form-input{appearance:none}
+textarea.form-input{min-height:80px;resize:vertical}
+.detail-section{margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)}
+.detail-title{font-size:10px;font-weight:700;color:#3d4560;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.activity-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:13px}
+.activity-time{font-size:11px;color:#3d4560}
+.verify-link{display:inline-block;padding:4px 10px;background:rgba(59,130,246,0.1);color:#3b82f6;border-radius:8px;font-size:11px;margin:2px;font-weight:600}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.header{padding:12px 16px}.content{padding:0 16px 16px}}
+</style>
+</head>
+<body>
+<div class="header">
+<div style="display:flex;align-items:center"><a href="/" class="back-link">← Dashboard</a><h1>Deal<span>Matcher</span> Pipeline</h1></div>
+<div class="header-actions"><button class="btn btn-secondary" onclick="openVerifyModal()">🔍 Verify</button><button class="btn btn-primary" onclick="openAddModal()">+ Add Lead</button></div>
+</div>
+<div class="stats" id="stats"></div>
+<div class="content">
+<div class="filters" id="filters">
+<button class="filter-btn active" onclick="filterLeads('all',this)">All</button>
+<button class="filter-btn" onclick="filterLeads('hot',this)">🔥 Hot</button>
+<button class="filter-btn" onclick="filterLeads('new',this)">New</button>
+<button class="filter-btn" onclick="filterLeads('contacted',this)">Contacted</button>
+<button class="filter-btn" onclick="filterLeads('qualified',this)">Qualified</button>
+<button class="filter-btn" onclick="filterLeads('active',this)">Active</button>
+</div>
+<div id="leads-list"></div>
+</div>
+<div class="modal-overlay" id="addModal"><div class="modal"><h2>Add New Lead</h2>
+<div class="form-row"><div class="form-group"><label>Name *</label><input class="form-input" id="addName" required></div><div class="form-group"><label>Company</label><input class="form-input" id="addCompany"></div></div>
+<div class="form-row"><div class="form-group"><label>Email</label><input class="form-input" id="addEmail" type="email"></div><div class="form-group"><label>Phone</label><input class="form-input" id="addPhone"></div></div>
+<div class="form-row"><div class="form-group"><label>Instagram</label><input class="form-input" id="addInstagram" placeholder="@handle"></div><div class="form-group"><label>LinkedIn URL</label><input class="form-input" id="addLinkedin"></div></div>
+<div class="form-row"><div class="form-group"><label>Source</label><select class="form-input" id="addSource"><option value="instagram">Instagram</option><option value="website">Website</option><option value="referral">Referral</option><option value="cold_outreach">Cold Outreach</option><option value="manual">Manual</option></select></div><div class="form-group"><label>Priority</label><select class="form-input" id="addPriority"><option value="hot">🔥 Hot</option><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div></div>
+<div class="form-row"><div class="form-group"><label>Deal Types</label><input class="form-input" id="addDealTypes" placeholder="real_estate, business"></div><div class="form-group"><label>Capital Available</label><input class="form-input" id="addCapital" placeholder="$500K-$2M"></div></div>
+<div class="form-group"><label>Notes</label><textarea class="form-input" id="addNotes"></textarea></div>
+<div style="display:flex;gap:8px;margin-top:16px"><button class="btn btn-primary" style="flex:1" onclick="addLead()">Add Lead</button><button class="btn btn-secondary" onclick="closeModal('addModal')">Cancel</button></div>
+</div></div>
+<div class="modal-overlay" id="verifyModal"><div class="modal"><h2>🔍 Quick Verify</h2>
+<div style="margin-bottom:16px"><div class="form-group"><label>Company Name</label><input class="form-input" id="verifyCompany" placeholder="Tru Vizions LLC"></div><div class="form-group"><label>State (optional)</label><input class="form-input" id="verifyState" placeholder="TX"></div><button class="btn btn-primary" onclick="verifyCompany()" style="width:100%;margin-top:8px">Search Company</button></div>
+<div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px"><div class="form-group"><label>Person Name</label><input class="form-input" id="verifyPerson" placeholder="Gary Randal"></div><div class="form-group"><label>Company (optional)</label><input class="form-input" id="verifyPersonCompany" placeholder="Tru Vizions LLC"></div><button class="btn btn-primary" onclick="verifyLinkedIn()" style="width:100%;margin-top:8px">Search LinkedIn</button></div>
+<div id="verifyResults" style="margin-top:16px"></div>
+<button class="btn btn-secondary" onclick="closeModal('verifyModal')" style="width:100%;margin-top:16px">Close</button>
+</div></div>
+<div class="modal-overlay" id="detailModal"><div class="modal" id="detailContent"></div></div>
+<script>
+'use strict';
+const DM_TOKEN=localStorage.getItem('dm_token');
+if(!DM_TOKEN){window.location.href='/login.html';}
+let allLeads=[];let currentFilter='all';
+function esc(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+async function api(url,opts={}){if(!opts.headers)opts.headers={};opts.headers['x-auth-token']=DM_TOKEN;if(opts.body&&!opts.headers['Content-Type'])opts.headers['Content-Type']='application/json';const r=await fetch(url,opts);if(r.status===401){localStorage.removeItem('dm_token');window.location.href='/login.html';return}return r.json()}
+async function loadLeads(){const data=await api('/api/leads');if(!data)return;allLeads=data.leads;renderStats(data.stats);renderLeads(allLeads)}
+function renderStats(s){document.getElementById('stats').innerHTML='<div class="stat-card"><div class="stat-number">'+s.total+'</div><div class="stat-label">Total Leads</div></div><div class="stat-card"><div class="stat-number">'+s.hot+'</div><div class="stat-label">🔥 Hot</div></div><div class="stat-card"><div class="stat-number">'+s.new+'</div><div class="stat-label">New</div></div><div class="stat-card"><div class="stat-number">'+s.qualified+'</div><div class="stat-label">Qualified</div></div><div class="stat-card"><div class="stat-number">'+s.active+'</div><div class="stat-label">Active</div></div><div class="stat-card"><div class="stat-number">'+s.closed+'</div><div class="stat-label">Closed</div></div><div class="stat-card"><div class="stat-number">'+Math.round(s.avgScore)+'%</div><div class="stat-label">Avg Score</div></div>'}
+function renderLeads(leads){const filtered=currentFilter==='all'?leads:currentFilter==='hot'?leads.filter(l=>l.priority==='hot'):leads.filter(l=>l.status===currentFilter);document.getElementById('leads-list').innerHTML=filtered.length===0?'<div style="text-align:center;padding:48px;color:#3d4560">No leads found. Add leads from Instagram DMs and subscriber signups.</div>':filtered.map(l=>'<div class="lead-card '+l.priority+'" onclick="openDetail('+l.id+')"><div class="lead-header"><div><div class="lead-name">'+esc(l.name)+'</div>'+(l.company?'<div class="lead-company">'+esc(l.company)+'</div>':'')+'</div><span class="badge badge-'+l.priority+'">'+l.priority+'</span></div><div class="lead-meta"><span class="badge badge-'+l.status+'">'+l.status+'</span>'+(l.source?'<span style="font-size:11px;color:#3d4560">'+l.source+'</span>':'')+'<span style="font-size:11px;color:#7c8599">Score: '+l.verification_score+'%<span class="score-bar"><span class="score-fill" style="width:'+l.verification_score+'%"></span></span></span></div></div>').join('')}
+function filterLeads(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderLeads(allLeads)}
+function openAddModal(){document.getElementById('addModal').classList.add('active')}
+function openVerifyModal(){document.getElementById('verifyModal').classList.add('active');document.getElementById('verifyResults').innerHTML=''}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+async function addLead(){const data={name:document.getElementById('addName').value,company:document.getElementById('addCompany').value,email:document.getElementById('addEmail').value,phone:document.getElementById('addPhone').value,instagram:document.getElementById('addInstagram').value,linkedin:document.getElementById('addLinkedin').value,source:document.getElementById('addSource').value,priority:document.getElementById('addPriority').value,deal_types:document.getElementById('addDealTypes').value,capital_available:document.getElementById('addCapital').value,notes:document.getElementById('addNotes').value};if(!data.name)return alert('Name is required');await api('/api/leads',{method:'POST',body:JSON.stringify(data)});closeModal('addModal');['addName','addCompany','addEmail','addPhone','addInstagram','addLinkedin','addNotes','addDealTypes','addCapital'].forEach(id=>document.getElementById(id).value='');loadLeads()}
+async function openDetail(id){const data=await api('/api/leads/'+id);if(!data)return;const l=data.lead;document.getElementById('detailContent').innerHTML='<div style="display:flex;justify-content:space-between;align-items:start"><div><h2>'+esc(l.name)+'</h2>'+(l.company?'<div style="color:#7c8599">'+esc(l.company)+'</div>':'')+'</div><span class="badge badge-'+l.priority+'">'+l.priority+'</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;font-size:13px">'+(l.email?'<div>📧 '+esc(l.email)+'</div>':'')+(l.phone?'<div>📱 '+esc(l.phone)+'</div>':'')+(l.instagram?'<div>📷 @'+esc(l.instagram)+'</div>':'')+(l.linkedin?'<div>💼 <a href="'+esc(l.linkedin)+'" target="_blank">LinkedIn</a></div>':'')+(l.capital_available?'<div>💰 '+esc(l.capital_available)+'</div>':'')+(l.markets?'<div>📍 '+esc(l.markets)+'</div>':'')+'</div><div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:center"><span class="badge badge-'+l.status+'">'+l.status+'</span><span style="font-size:12px;color:#7c8599">Score: '+l.verification_score+'%</span>'+(l.company_verified?'<span class="badge badge-verified">Company ✓</span>':'')+(l.linkedin_verified?'<span class="badge badge-verified">LinkedIn ✓</span>':'')+(l.pof_verified?'<span class="badge badge-verified">POF ✓</span>':'')+'</div><div style="display:flex;gap:6px;margin-top:16px;flex-wrap:wrap"><select class="form-input" style="width:auto;padding:6px 10px;font-size:12px" onchange="updateLead('+l.id+',\'status\',this.value)">'+['new','contacted','qualified','negotiating','active','closed_won','closed_lost','dead'].map(s=>'<option value="'+s+'"'+(l.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select><select class="form-input" style="width:auto;padding:6px 10px;font-size:12px" onchange="updateLead('+l.id+',\'priority\',this.value)">'+['hot','high','medium','low','cold'].map(p=>'<option value="'+p+'"'+(l.priority===p?' selected':'')+'>'+p+'</option>').join('')+'</select><button class="btn btn-sm btn-secondary" onclick="requestPOF('+l.id+')">Request POF</button></div>'+(l.notes?'<div class="detail-section"><div class="detail-title">Notes</div><div style="font-size:13px;color:#ccc;white-space:pre-wrap">'+esc(l.notes)+'</div></div>':'')+'<div class="detail-section"><div class="detail-title">Activity Log</div>'+(data.activities.length===0?'<div style="font-size:13px;color:#3d4560">No activity yet</div>':data.activities.map(a=>'<div class="activity-item"><strong>'+esc(a.title)+'</strong><br><span class="activity-time">'+new Date(a.created_at).toLocaleString()+'</span>'+(a.description?'<br><span style="color:#7c8599;font-size:12px">'+esc(a.description)+'</span>':'')+'</div>').join(''))+'</div><div style="display:flex;gap:8px;margin-top:16px"><button class="btn btn-secondary" style="flex:1" onclick="closeModal(\'detailModal\')">Close</button><button class="btn btn-danger btn-sm" onclick="if(confirm(\'Delete this lead?\')){deleteLead('+l.id+')}">Delete</button></div>';document.getElementById('detailModal').classList.add('active')}
+async function updateLead(id,field,value){const body={};body[field]=value;await api('/api/leads/'+id,{method:'PUT',body:JSON.stringify(body)});loadLeads()}
+async function requestPOF(id){await api('/api/leads/'+id+'/request-pof',{method:'POST'});alert('POF request logged');openDetail(id)}
+async function deleteLead(id){await api('/api/leads/'+id,{method:'DELETE'});closeModal('detailModal');loadLeads()}
+async function verifyCompany(){const company=document.getElementById('verifyCompany').value;const state=document.getElementById('verifyState').value;if(!company)return;const data=await api('/api/verify/company',{method:'POST',body:JSON.stringify({company,state})});if(!data)return;const r=data.result;document.getElementById('verifyResults').innerHTML='<div style="margin-top:12px"><div class="detail-title">Search Links for: '+esc(r.company_name)+'</div>'+Object.entries(r.search_urls).map(([k,v])=>'<a href="'+v+'" target="_blank" class="verify-link">'+k.replace(/_/g,' ')+'</a>').join('')+'<div style="margin-top:12px"><div class="detail-title">Checklist</div>'+r.checklist.map(c=>'<div style="font-size:12px;padding:4px 0;color:#7c8599">⬜ '+c.item+'</div>').join('')+'</div></div>'}
+async function verifyLinkedIn(){const name=document.getElementById('verifyPerson').value;const company=document.getElementById('verifyPersonCompany').value;if(!name)return;const data=await api('/api/verify/linkedin',{method:'POST',body:JSON.stringify({name,company})});if(!data)return;const r=data.result;document.getElementById('verifyResults').innerHTML='<div style="margin-top:12px"><div class="detail-title">LinkedIn Search: '+esc(r.person)+'</div>'+Object.entries(r.search_urls).filter(([k,v])=>v).map(([k,v])=>'<a href="'+v+'" target="_blank" class="verify-link">'+k.replace(/_/g,' ')+'</a>').join('')+'<div style="margin-top:12px"><div class="detail-title">Verification Checklist</div>'+r.checklist.map(c=>'<div style="font-size:12px;padding:4px 0;color:#7c8599">⬜ '+c.item+'</div>').join('')+'<div style="margin-top:12px"><div class="detail-title">🚩 Red Flags to Watch</div>'+r.red_flags.map(f=>'<div style="font-size:12px;padding:2px 0;color:#ef4444">⚠️ '+f+'</div>').join('')+'</div></div>'}
+loadLeads();
+</script>
+</body>
+</html>
