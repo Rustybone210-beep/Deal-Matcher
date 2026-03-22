@@ -82,7 +82,7 @@ async function sendDigestForAll() {
 
     try {
       await resend.emails.send({
-        from: 'DealMatcher <onboarding@resend.dev>',
+        from: 'DealMatcher <fields@dealmatcherapp.com>',
         to: inv.contact_email,
         subject: `Your Top ${matches.length} Deal Matches This Week — DealMatcher`,
         html: buildDigestHtml(inv, matches)

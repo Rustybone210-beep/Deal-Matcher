@@ -55,7 +55,7 @@ function addToInvestors(sub) {
 async function alertJ(sub, investorId, matchCount) {
   try {
     await resend.emails.send({
-      from: 'DealMatcher <onboarding@resend.dev>',
+      from: 'DealMatcher <fields@dealmatcherapp.com>',
       to: J_EMAIL,
       subject: '🎯 New DealMatcher Subscriber: ' + sub.name,
       html: `
@@ -88,7 +88,7 @@ async function alertJ(sub, investorId, matchCount) {
 async function welcomeEmail(sub) {
   try {
     await resend.emails.send({
-      from: 'DealMatcher <onboarding@resend.dev>',
+      from: 'DealMatcher <fields@dealmatcherapp.com>',
       to: sub.email,
       subject: 'Welcome to DealMatcher — Your Deal Criteria is Locked In',
       html: `
