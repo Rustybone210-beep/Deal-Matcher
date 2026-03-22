@@ -1,0 +1,260 @@
+[2026-03-22T18:42:47.638Z] ========================================
+[2026-03-22T18:42:47.641Z] BRUCE QUEUE STARTED — 3 tasks
+[2026-03-22T18:42:47.641Z] Pause between tasks: 60s
+[2026-03-22T18:42:47.641Z] ========================================
+[2026-03-22T18:42:47.641Z] STARTING: Gas Stations from Crexi
+[2026-03-22T18:42:47.641Z] PROMPT: Go to Crexi.com and find 5 gas stations for sale over $5M. For each save: name, city, state, asking_price, revenue (0 if not shown), industry (gas station), url. Save as CSV with those headers to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/gas-stations-new.csv. Reply only: done.
+[2026-03-22T18:43:08.478Z] DONE: Gas Stations from Crexi
+[2026-03-22T18:43:08.479Z] OUTPUT: [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
+⚠️ 🌐 Browser: `snapshot · 3D916AE5E4A7E88C85A4365209647EC4` failed: Can't reach the OpenClaw browser control service. Start (or restart) the OpenClaw gateway (OpenClaw.app menubar, or `openclaw gateway`) and try again. (Error: Error: listen EADDRINUSE: address already in use 127.0.0.1:18792)
+[2026-03-22T18:43:08.479Z] PAUSING 60s before next task...
+[2026-03-22T18:44:08.482Z] STARTING: Multifamily from Crexi
+[2026-03-22T18:44:08.484Z] PROMPT: Go to Crexi.com and find 5 multifamily apartment buildings for sale over $5M. For each save: name, city, state, asking_price, revenue (0 if not shown), industry (multifamily), url. Save as CSV with those headers to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/multifamily-new.csv. Reply only: done.
+[2026-03-22T18:47:39.171Z] Loaded 3 custom tasks from scripts/bruce-tasks-default.json
+[2026-03-22T18:47:39.174Z] ========================================
+[2026-03-22T18:47:39.174Z] BRUCE QUEUE STARTED — 3 tasks
+[2026-03-22T18:47:39.174Z] Pause between tasks: 60s
+[2026-03-22T18:47:39.174Z] ========================================
+[2026-03-22T18:47:39.174Z] STARTING: Gas Stations from Crexi
+[2026-03-22T18:47:39.174Z] PROMPT: Search the web for gas stations for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (gas station), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/gas-stations-new.csv. Reply only: done.
+[2026-03-22T18:48:00.892Z] ERROR: Gas Stations from Crexi — Command failed: /opt/homebrew/bin/openclaw agent --local -m "Search the web for gas stations for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (gas station), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/gas-stations-new.csv. Reply only: done." --session-id queue-1774205259174-0
+[35m[browser/service][39m [33mChrome extension relay init failed for profile "chrome": Error: listen EADDRINUSE: address already in use 127.0.0.1:18792[39m
+[tools] browser failed: Can't reach the OpenClaw browser control service. Start (or restart) the OpenClaw gateway (OpenClaw.app menubar, or `openclaw gateway`) and try again. (Error: Error: listen EADDRINUSE: address already in use 127.0.0.1:18792)
+[31m[diagnostic][39m [31mlane task error: lane=main durationMs=20181 error="FailoverError: LLM error: {[39m
+[31m  "error": {[39m
+[31m    "code": 429,[39m
+[31m    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3-flash\nPlease retry in 59.170184773s.",[39m
+[31m    "status": "RESOURCE_EXHAUSTED",[39m
+[31m    "details": [[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.Help",[39m
+[31m        "links": [[39m
+[31m          {[39m
+[31m            "description": "Learn more about Gemini API quotas",[39m
+[31m            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.QuotaFailure",[39m
+[31m        "violations": [[39m
+[31m          {[39m
+[31m            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",[39m
+[31m            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",[39m
+[31m            "quotaDimensions": {[39m
+[31m              "location": "global",[39m
+[31m              "model": "gemini-3-flash"[39m
+[31m            },[39m
+[31m            "quotaValue": "20"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.RetryInfo",[39m
+[31m        "retryDelay": "59s"[39m
+[31m      }[39m
+[31m    ][39m
+[31m  }[39m
+[31m}[39m
+[31m"[39m
+[31m[diagnostic][39m [31mlane task error: lane=session:queue-1774205259174-0 durationMs=20183 error="FailoverError: LLM error: {[39m
+[31m  "error": {[39m
+[31m    "code": 429,[39m
+[31m    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3-flash\nPlease retry in 59.170184773s.",[39m
+[31m    "status": "RESOURCE_EXHAUSTED",[39m
+[31m    "details": [[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.Help",[39m
+[31m        "links": [[39m
+[31m          {[39m
+[31m            "description": "Learn more about Gemini API quotas",[39m
+[31m            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.QuotaFailure",[39m
+[31m        "violations": [[39m
+[31m          {[39m
+[31m            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",[39m
+[31m            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",[39m
+[31m            "quotaDimensions": {[39m
+[31m              "location": "global",[39m
+[31m              "model": "gemini-3-flash"[39m
+[31m            },[39m
+[31m            "quotaValue": "20"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.RetryInfo",[39m
+[31m        "retryDelay": "59s"[39m
+[31m      }[39m
+[31m    ][39m
+[31m  }[39m
+[31m}[39m
+[31m"[39m
+FailoverError: LLM error: {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3-flash\nPlease retry in 59.170184773s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-3-flash"
+            },
+            "quotaValue": "20"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "59s"
+      }
+    ]
+  }
+}
+
+
+[2026-03-22T18:48:00.893Z] PAUSING 60s before next task...
+[2026-03-22T18:49:00.894Z] STARTING: Multifamily from Crexi
+[2026-03-22T18:49:00.896Z] PROMPT: Search the web for multifamily apartment buildings for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (multifamily), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/multifamily-new.csv. Reply only: done.
+[2026-03-22T18:49:13.018Z] DONE: Multifamily from Crexi
+[2026-03-22T18:49:13.019Z] OUTPUT: [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
+No reply from agent.
+[2026-03-22T18:49:13.019Z] PAUSING 60s before next task...
+[2026-03-22T18:50:13.021Z] STARTING: Retail from Crexi
+[2026-03-22T18:50:13.021Z] PROMPT: Search the web for retail properties or shopping centers for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (retail), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/retail-new.csv. Reply only: done.
+[2026-03-22T18:50:30.503Z] ERROR: Retail from Crexi — Command failed: /opt/homebrew/bin/openclaw agent --local -m "Search the web for retail properties or shopping centers for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (retail), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/retail-new.csv. Reply only: done." --session-id queue-1774205413020-2
+[31m[diagnostic][39m [31mlane task error: lane=main durationMs=15889 error="FailoverError: LLM error: {[39m
+[31m  "error": {[39m
+[31m    "code": 429,[39m
+[31m    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3-flash\nPlease retry in 29.587075134s.",[39m
+[31m    "status": "RESOURCE_EXHAUSTED",[39m
+[31m    "details": [[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.Help",[39m
+[31m        "links": [[39m
+[31m          {[39m
+[31m            "description": "Learn more about Gemini API quotas",[39m
+[31m            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.QuotaFailure",[39m
+[31m        "violations": [[39m
+[31m          {[39m
+[31m            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",[39m
+[31m            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",[39m
+[31m            "quotaDimensions": {[39m
+[31m              "location": "global",[39m
+[31m              "model": "gemini-3-flash"[39m
+[31m            },[39m
+[31m            "quotaValue": "20"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.RetryInfo",[39m
+[31m        "retryDelay": "29s"[39m
+[31m      }[39m
+[31m    ][39m
+[31m  }[39m
+[31m}[39m
+[31m"[39m
+[31m[diagnostic][39m [31mlane task error: lane=session:queue-1774205413020-2 durationMs=15893 error="FailoverError: LLM error: {[39m
+[31m  "error": {[39m
+[31m    "code": 429,[39m
+[31m    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3-flash\nPlease retry in 29.587075134s.",[39m
+[31m    "status": "RESOURCE_EXHAUSTED",[39m
+[31m    "details": [[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.Help",[39m
+[31m        "links": [[39m
+[31m          {[39m
+[31m            "description": "Learn more about Gemini API quotas",[39m
+[31m            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.QuotaFailure",[39m
+[31m        "violations": [[39m
+[31m          {[39m
+[31m            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",[39m
+[31m            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",[39m
+[31m            "quotaDimensions": {[39m
+[31m              "location": "global",[39m
+[31m              "model": "gemini-3-flash"[39m
+[31m            },[39m
+[31m            "quotaValue": "20"[39m
+[31m          }[39m
+[31m        ][39m
+[31m      },[39m
+[31m      {[39m
+[31m        "@type": "type.googleapis.com/google.rpc.RetryInfo",[39m
+[31m        "retryDelay": "29s"[39m
+[31m      }[39m
+[31m    ][39m
+[31m  }[39m
+[31m}[39m
+[31m"[39m
+FailoverError: LLM error: {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3-flash\nPlease retry in 29.587075134s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-3-flash"
+            },
+            "quotaValue": "20"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "29s"
+      }
+    ]
+  }
+}
+
+
+[2026-03-22T18:50:30.504Z] ========================================
+[2026-03-22T18:50:30.504Z] QUEUE COMPLETE: 1 done, 2 failed, 3 total
+[2026-03-22T18:50:30.504Z] ========================================
+[2026-03-22T18:50:30.505Z] Bruce queue process exited.

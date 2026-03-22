@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Gas Stations from Crexi",
+    "prompt": "Search the web for gas stations for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (gas station), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/gas-stations-new.csv. Reply only: done."
+  },
+  {
+    "name": "Multifamily from Crexi",
+    "prompt": "Search the web for multifamily apartment buildings for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (multifamily), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/multifamily-new.csv. Reply only: done."
+  },
+  {
+    "name": "Retail from Crexi",
+    "prompt": "Search the web for retail properties or shopping centers for sale over $5M on Crexi.com. Find 5 listings. For each save: name, city, state, asking_price (number only), revenue (0 if not shown), industry (retail), url. Save as CSV with headers: name,city,state,asking_price,revenue,industry,url to /Users/jfields/.openclaw/workspace/cashclaw/dealmatcher/retail-new.csv. Reply only: done."
+  }
+]
