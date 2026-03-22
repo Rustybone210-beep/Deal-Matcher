@@ -64,11 +64,14 @@ button,input,textarea,select{font:inherit;color:inherit}a{color:var(--teal);text
 <div class="toast" id="toast"></div>
 <script>
 'use strict';
+const DM_TOKEN=localStorage.getItem('dm_token');
+if(!DM_TOKEN){window.location.href='/login.html';throw new Error('no auth')}
+
 let currentPage='dashboard';
 document.querySelectorAll('.nav-item').forEach(b=>{b.addEventListener('click',()=>showPage(b.dataset.page))});
 function showPage(p){currentPage=p;document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));const el=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1));if(el)el.classList.add('active');const nav=document.querySelector('.nav-item[data-page="'+p+'"]');if(nav)nav.classList.add('active');refresh()}
 async function refresh(){if(currentPage==='dashboard')await loadDashboard();if(currentPage==='deals')await loadDeals();if(currentPage==='investors')await loadInvestors();if(currentPage==='matches')await loadMatches();if(currentPage==='outreach')await loadOutreach()}
-async function api(u,o={}){return(await fetch(u,o)).json()}
+async function api(u,o={}){if(!o.headers)o.headers={};o.headers['x-auth-token']=DM_TOKEN;const r=await fetch(u,o);if(r.status===401){localStorage.removeItem('dm_token');window.location.href='/login.html';return}return r.json()}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
 function fmt$(n){if(!n&&n!==0)return'—';return'$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:0})}
 function esc(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}

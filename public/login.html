@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealMatcher — Login</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a1a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:#12122a;border:1px solid #1e1e3a;border-radius:16px;padding:40px;width:380px;text-align:center}
+.login-box h1{color:#00d4aa;font-size:28px;margin-bottom:8px}
+.login-box p{color:#888;margin-bottom:30px;font-size:14px}
+input[type="password"]{width:100%;padding:14px 16px;background:#0a0a1a;border:1px solid #2a2a4a;border-radius:8px;color:#fff;font-size:16px;margin-bottom:16px;outline:none}
+input[type="password"]:focus{border-color:#00d4aa}
+button{width:100%;padding:14px;background:#00d4aa;color:#0a0a1a;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;transition:background 0.2s}
+button:hover{background:#00e8bb}
+.error{color:#ff4757;font-size:14px;margin-top:12px;display:none}
+.logo{font-size:36px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="logo">🎯</div>
+  <h1>DealMatcher</h1>
+  <p>Admin Dashboard</p>
+  <input type="password" id="pass" placeholder="Enter password" autofocus>
+  <button onclick="login()">Sign In</button>
+  <div class="error" id="err">Wrong password. Try again.</div>
+</div>
+<script>
+document.getElementById('pass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+async function login(){
+  const pass=document.getElementById('pass').value;
+  if(!pass)return;
+  try{
+    const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})});
+    const d=await r.json();
+    if(d.success){
+      localStorage.setItem('dm_token',d.token);
+      window.location.href='/';
+    }else{
+      document.getElementById('err').style.display='block';
+      document.getElementById('pass').value='';
+    }
+  }catch(e){document.getElementById('err').style.display='block'}
+}
+</script>
+</body>
+</html>
