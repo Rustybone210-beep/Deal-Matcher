@@ -50,6 +50,12 @@ router.put('/update', (req, res) => {
 });
 
 router.post('/chat', async (req, res) => {
+  // AI chat is Pro/Enterprise only — free users get static help
+  const inv = req.body.investor_id ? db.prepare('SELECT * FROM investors WHERE id = ?').get(req.body.investor_id) : null;
+  const notes = inv ? inv.notes || '' : '';
+  if (notes.includes('free') || !process.env.ANTHROPIC_API_KEY) {
+    return res.json({ reply: "The AI assistant is available on Pro and Enterprise plans. Browse your matches below and click 'I\'m Interested' on any deal — our team will reach out within 24 hours. Upgrade to Pro for personalized AI deal guidance." });
+  }
   try {
     const { message, investor_name, investor_criteria, matches_summary } = req.body;
     if (!message) return res.status(400).json({ error: 'Message required' });
