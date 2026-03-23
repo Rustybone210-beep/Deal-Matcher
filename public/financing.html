@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealMatcher — Financing Partners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Fraunces:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#060810;--s1:rgba(14,17,28,0.92);--s2:rgba(20,24,40,0.88);--bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.1);--teal:#34d399;--teal2:#059669;--gold:#f59e0b;--t1:#f0f2f8;--t2:#7c8599;--t3:#3d4560;--sans:'Instrument Sans',system-ui,sans-serif;--serif:'Fraunces',serif}
+body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100vh}
+.header{background:rgba(8,10,18,0.98);border-bottom:1px solid var(--bd);padding:16px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50}
+.header a{color:var(--t2);font-size:13px;text-decoration:none}
+.header h1{font-family:var(--serif);font-size:20px}.header h1 span{color:var(--teal)}
+.hero{padding:48px 24px;text-align:center;background:linear-gradient(135deg,rgba(52,211,153,0.06),rgba(5,150,105,0.03));border-bottom:1px solid var(--bd)}
+.hero h2{font-family:var(--serif);font-size:32px;font-weight:700;margin-bottom:8px}
+.hero p{color:var(--t2);font-size:16px;max-width:600px;margin:0 auto}
+.content{max-width:1100px;margin:0 auto;padding:32px 24px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.section-title{font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:20px}
+.section{margin-bottom:48px}
+.lender-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.lender-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:20px;transition:all 0.15s}
+.lender-card:hover{border-color:rgba(52,211,153,0.3);transform:translateY(-2px)}
+.lender-name{font-weight:700;font-size:16px;color:var(--t1);margin-bottom:4px}
+.lender-type{font-size:11px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+.lender-detail{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px}
+.lender-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ltag{padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;background:rgba(59,130,246,0.1);color:#3b82f6}
+.ltag.gas{background:rgba(245,158,11,0.1);color:var(--gold)}
+.ltag.multi{background:rgba(139,92,246,0.1);color:#8b5cf6}
+.ltag.retail{background:rgba(236,72,153,0.1);color:#ec4899}
+.ltag.sba{background:rgba(52,211,153,0.1);color:var(--teal)}
+.lender-link{display:inline-block;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;text-decoration:none;border:1px solid var(--bd2);color:var(--t2);transition:all 0.15s}
+.lender-link:hover{color:var(--teal);border-color:rgba(52,211,153,0.3);text-decoration:none}
+.cta-box{background:linear-gradient(135deg,rgba(52,211,153,0.08),rgba(5,150,105,0.04));border:1px solid rgba(52,211,153,0.2);border-radius:20px;padding:32px;text-align:center;margin-top:48px}
+.cta-box h3{font-family:var(--serif);font-size:22px;margin-bottom:8px}
+.cta-box p{color:var(--t2);font-size:14px;margin-bottom:20px}
+.cta-btn{display:inline-block;padding:14px 32px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--bg);border-radius:999px;font-size:15px;font-weight:700;text-decoration:none}
+@media(max-width:640px){.lender-grid{grid-template-columns:1fr}.hero h2{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="header"><a href="/">← Back</a><h1>Deal<span>Matcher</span></h1></div>
+<div class="hero"><h2>Financing Your Next Acquisition</h2><p>Vetted lenders with decades of experience financing gas stations, multifamily, and commercial real estate acquisitions.</p></div>
+<div class="content">
+
+<div class="section">
+<div class="section-label">Gas Station & NNN Lease</div>
+<div class="section-title">Gas Station Acquisition Lenders</div>
+<div class="lender-grid">
+
+<div class="lender-card">
+<div class="lender-name">NNNLenders / Gas Station Lenders</div>
+<div class="lender-type">NNN Specialist — 25+ Years</div>
+<div class="lender-detail">Principals average 25 years in NNN financing. Specialize in gas station, convenience store, and triple-net tenant lease financing. Known for fast execution on 1031 exchanges.</div>
+<div class="lender-tags"><span class="ltag gas">Gas Stations</span><span class="ltag">NNN</span><span class="ltag">1031 Exchange</span></div>
+<a href="https://www.gasstationlenders.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">BMC Capital</div>
+<div class="lender-type">Single Tenant NNN Leader</div>
+<div class="lender-detail">Recognized leader in single-tenant NNN leased loans. Finances both credit and non-credit tenant properties across gas stations, CVS, AutoZone, Home Depot, and more.</div>
+<div class="lender-tags"><span class="ltag gas">Gas Stations</span><span class="ltag">NNN</span><span class="ltag retail">Retail</span></div>
+<a href="https://www.bmccapital.com/loan-types/nnn-retail" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">HCN Bank</div>
+<div class="lender-type">FDIC Insured Commercial Bank</div>
+<div class="lender-detail">California State Chartered commercial bank and FDIC member. Specializes in NNN lease financing with fast turnaround, especially for 1031 exchange buyers.</div>
+<div class="lender-tags"><span class="ltag gas">Gas Stations</span><span class="ltag">NNN</span><span class="ltag">FDIC Insured</span></div>
+<a href="https://www.hcnbank.com/Commercial-Real-Estate/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Triple Net Lending</div>
+<div class="lender-type">NNN Financing Specialist</div>
+<div class="lender-detail">Deep lender knowledge across permanent and construction NNN investments. Tailors support for each deal including appraisals, property assessments, and title work.</div>
+<div class="lender-tags"><span class="ltag gas">Gas Stations</span><span class="ltag">NNN</span><span class="ltag retail">Retail</span></div>
+<a href="https://www.triplenetlending.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Select Commercial</div>
+<div class="lender-type">NNN Lease Financing</div>
+<div class="lender-detail">Competitive commercial mortgage rates for NNN properties. Current rates around 5.77%. Finances gas stations, industrial, retail, and medical NNN properties.</div>
+<div class="lender-tags"><span class="ltag gas">Gas Stations</span><span class="ltag">NNN</span><span class="ltag">Competitive Rates</span></div>
+<a href="https://selectcommercial.com/nnn-lease-financing.php" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Paramount Specialty Finance</div>
+<div class="lender-type">Net Lease Sector Expert</div>
+<div class="lender-detail">Custom-tailored lending solutions for the net lease sector. Innovative approaches to NNN financing with focus on borrower success and competitive terms.</div>
+<div class="lender-tags"><span class="ltag gas">Gas Stations</span><span class="ltag">NNN</span><span class="ltag">Custom Solutions</span></div>
+<a href="https://www.paramountfin.com/nnn-platform" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+</div>
+</div>
+
+<div class="section">
+<div class="section-label">Multifamily & Apartments</div>
+<div class="section-title">Multifamily Acquisition Lenders</div>
+<div class="lender-grid">
+
+<div class="lender-card">
+<div class="lender-name">Walker & Dunlop</div>
+<div class="lender-type">#1 Fannie Mae DUS Lender — 63 Years</div>
+<div class="lender-detail">Number one Fannie Mae DUS lender in 9 of the last 12 years. Also #3 Freddie Mac Optigo lender and #2 HUD multifamily lender nationwide. Full range of agency products.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag sba">Fannie Mae</span><span class="ltag sba">Freddie Mac</span></div>
+<a href="https://www.walkerdunlop.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Berkadia</div>
+<div class="lender-type">$25.8B in Multifamily Loans</div>
+<div class="lender-detail">Provided $25.8 billion in multifamily loans in the most recent survey period. Longstanding relationships with Fannie Mae, Freddie Mac, and HUD. 30% increase in lending volume.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag sba">Fannie Mae</span><span class="ltag sba">HUD</span></div>
+<a href="https://www.berkadia.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Greystone</div>
+<div class="lender-type">30+ Years — Top 10 Freddie Mac</div>
+<div class="lender-detail">Over 30 years arranging hundreds of billions in multifamily debt. Top Fannie Mae Small Loan producer and #1 HUD/FHA multifamily lender. Also seniors housing specialist.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag sba">HUD/FHA</span><span class="ltag">Seniors Housing</span></div>
+<a href="https://www.greystone.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Arbor Realty Trust</div>
+<div class="lender-type">Multifamily Exclusive — 25+ Years</div>
+<div class="lender-detail">Exclusively multifamily lender. Approved Freddie Mac SBL, Fannie Mae DUS, and HUD/FHA lender. Over $1 billion annually with $16 billion servicing portfolio.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag sba">Freddie SBL</span><span class="ltag sba">Fannie DUS</span></div>
+<a href="https://www.arbor.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Merchants Capital</div>
+<div class="lender-type">$6.8B Direct Lender</div>
+<div class="lender-detail">Provided $6.8 billion in CRE loans, with $6.2 billion in multifamily. Direct lender with strong agency relationships across Fannie Mae, Freddie Mac, and HUD programs.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag">Direct Lender</span><span class="ltag sba">Agency</span></div>
+<a href="https://www.merchantscapital.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Northmarq</div>
+<div class="lender-type">$9.3B Multifamily — 63 Years</div>
+<div class="lender-detail">Established 63 years ago. $9.3 billion in multifamily financing with focus on garden apartments. Full-service including Fannie Mae, Freddie Mac, CMBS, and life company loans.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag">Garden Apts</span><span class="ltag">CMBS</span></div>
+<a href="https://www.northmarq.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+</div>
+</div>
+
+<div class="section">
+<div class="section-label">Government-Backed Programs</div>
+<div class="section-title">SBA & Agency Loan Programs</div>
+<div class="lender-grid">
+
+<div class="lender-card">
+<div class="lender-name">SBA 7(a) Loan Program</div>
+<div class="lender-type">U.S. Small Business Administration</div>
+<div class="lender-detail">Up to $5M for business acquisitions. Government-guaranteed, lower down payments (10-20%), terms up to 25 years with real estate. Use SBA Lender Match to find approved lenders in your area.</div>
+<div class="lender-tags"><span class="ltag sba">SBA Guaranteed</span><span class="ltag gas">Gas Stations</span><span class="ltag retail">Retail</span></div>
+<a href="https://www.sba.gov/funding-programs/loans/7a-loans" target="_blank" class="lender-link">SBA Lender Match ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">SBA 504 Loan Program</div>
+<div class="lender-type">U.S. Small Business Administration</div>
+<div class="lender-detail">Long-term, fixed-rate financing for real estate and equipment purchases. Ideal for gas station acquisitions with significant real estate components. Lower down payments than conventional.</div>
+<div class="lender-tags"><span class="ltag sba">SBA Guaranteed</span><span class="ltag gas">Gas Stations</span><span class="ltag">Real Estate</span></div>
+<a href="https://www.sba.gov/funding-programs/loans" target="_blank" class="lender-link">Learn More ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Fannie Mae Multifamily</div>
+<div class="lender-type">35+ Years — $500B+ Portfolio</div>
+<div class="lender-detail">Largest guarantor of mortgages in the U.S. Non-recourse financing from $1M to $100M. Fixed rates, up to 80% LTV, 30-year terms. Backs 20% of all U.S. multifamily loans.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag sba">Agency</span><span class="ltag">Non-Recourse</span></div>
+<a href="https://multifamily.fanniemae.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Freddie Mac Multifamily</div>
+<div class="lender-type">Small Balance $750K–$7.5M</div>
+<div class="lender-detail">Non-recourse apartment financing with 30-year amortizations. Small Balance Loan program perfect for $750K-$7.5M acquisitions. Up to 80% LTV with competitive rates.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag sba">Agency</span><span class="ltag">Small Balance</span></div>
+<a href="https://www.commercialrealestate.loans/freddie-mac-loans/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">HUD/FHA Multifamily Loans</div>
+<div class="lender-type">U.S. Dept. of Housing & Urban Dev.</div>
+<div class="lender-detail">Government-insured multifamily loans with the lowest rates available (4.09-6.59%). Terms up to 35 years. Non-recourse. Best for affordable and workforce housing acquisitions.</div>
+<div class="lender-tags"><span class="ltag multi">Multifamily</span><span class="ltag sba">Government</span><span class="ltag">Lowest Rates</span></div>
+<a href="https://www.hud.gov/program_offices/housing/mfh" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+<div class="lender-card">
+<div class="lender-name">Stormfield Capital</div>
+<div class="lender-type">Bridge & Short-Term CRE</div>
+<div class="lender-detail">Bridge and short-term financing for NNN lease and commercial properties. Fast execution for acquisitions needing quick close. Ideal for bridge-to-permanent financing strategies.</div>
+<div class="lender-tags"><span class="ltag">Bridge Loans</span><span class="ltag gas">Gas Stations</span><span class="ltag retail">Retail</span></div>
+<a href="https://stormfieldcapital.com/" target="_blank" class="lender-link">Visit Site ↗</a>
+</div>
+
+</div>
+</div>
+
+<div class="cta-box">
+<h3>Need help financing a matched deal?</h3>
+<p>Found a deal on DealMatcher you want to pursue? Our team can connect you with the right lender for your specific acquisition.</p>
+<a href="mailto:fields@dealmatcherapp.com" class="cta-btn">Contact Us — fields@dealmatcherapp.com</a>
+</div>
+
+</div>
+</body>
+</html>
