@@ -35,8 +35,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Public routes (no auth needed)
 app.use('/api/auth', authRouter);
 const portalRoutes = require('./routes/portal');
+const sellerRoutes = require('./routes/seller');
 app.use('/api/subscribe', subscribeRoutes);
 app.use('/api/portal', portalRoutes);
+app.use('/api/seller', sellerRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, app: 'DealMatcher', time: new Date().toISOString() });

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealMatcher — List Your Deal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Fraunces:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#060810;--s1:rgba(14,17,28,0.92);--s2:rgba(20,24,40,0.88);--bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.1);--teal:#34d399;--teal2:#059669;--gold:#f59e0b;--t1:#f0f2f8;--t2:#7c8599;--t3:#3d4560;--sans:'Instrument Sans',system-ui,sans-serif;--serif:'Fraunces',serif}
+body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100vh}
+.header{background:rgba(8,10,18,0.98);border-bottom:1px solid var(--bd);padding:16px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50}
+.header a{color:var(--t2);font-size:13px;text-decoration:none}
+.header h1{font-family:var(--serif);font-size:20px}.header h1 span{color:var(--teal)}
+.hero{padding:48px 24px;text-align:center;background:linear-gradient(135deg,rgba(52,211,153,0.06),rgba(5,150,105,0.03));border-bottom:1px solid var(--bd)}
+.hero h2{font-family:var(--serif);font-size:32px;font-weight:700;margin-bottom:8px}
+.hero p{color:var(--t2);font-size:16px;max-width:600px;margin:0 auto}
+.form-wrap{max-width:600px;margin:32px auto;padding:0 24px}
+.form-card{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:32px}
+.form-card h3{font-family:var(--serif);font-size:20px;margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--t1);outline:none;font-family:var(--sans)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal)}
+.field textarea{min-height:80px;resize:vertical}
+.field select{appearance:none}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--bg);border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;font-family:var(--sans)}
+.submit-btn:hover{opacity:0.9}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+.result{margin-top:20px;padding:20px;border-radius:12px;display:none;text-align:center}
+.result.success{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);color:var(--teal)}
+.result.error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444}
+.result h4{font-family:var(--serif);font-size:18px;margin-bottom:8px}
+.how-it-works{max-width:600px;margin:0 auto 48px;padding:0 24px}
+.step{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px}
+.step-num{width:36px;height:36px;border-radius:50%;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;color:var(--teal);font-size:14px;flex-shrink:0}
+.step-text h4{font-size:14px;font-weight:700;margin-bottom:2px}
+.step-text p{font-size:13px;color:var(--t2)}
+.section-title{font-family:var(--serif);font-size:18px;font-weight:700;padding:24px 24px 16px;text-align:center}
+@media(max-width:640px){.row{grid-template-columns:1fr}.hero h2{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="header"><a href="/">← Back</a><h1>Deal<span>Matcher</span></h1></div>
+<div class="hero"><h2>List Your Deal</h2><p>Submit your listing and our AI matching engine will instantly connect it with pre-qualified investors.</p></div>
+
+<div class="section-title">How It Works</div>
+<div class="how-it-works">
+<div class="step"><div class="step-num">1</div><div class="step-text"><h4>Submit Your Listing</h4><p>Enter your deal details below — property type, price, location.</p></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text"><h4>AI Matches Instantly</h4><p>Our engine scores your listing against every active investor's criteria in real time.</p></div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text"><h4>Investors Get Notified</h4><p>Matching investors receive an alert with your listing details and match score.</p></div></div>
+<div class="step"><div class="step-num">4</div><div class="step-text"><h4>We Facilitate the Deal</h4><p>When an investor expresses interest, we handle introductions through our secure process with mandatory escrow.</p></div></div>
+</div>
+
+<div class="form-wrap">
+<div class="form-card">
+<h3>Deal Details</h3>
+<div class="field"><label>Property / Business Name *</label><input id="name" placeholder="e.g. 7-Eleven NNN San Antonio"></div>
+<div class="row">
+<div class="field"><label>City</label><input id="city" placeholder="San Antonio"></div>
+<div class="field"><label>State</label><input id="state" placeholder="TX" maxlength="2"></div>
+</div>
+<div class="row">
+<div class="field"><label>Asking Price ($) *</label><input id="price" type="number" placeholder="10000000"></div>
+<div class="field"><label>Annual Revenue ($)</label><input id="revenue" type="number" placeholder="500000"></div>
+</div>
+<div class="field"><label>Industry / Asset Type *</label>
+<select id="industry"><option value="">Select...</option><option value="gas station">Gas Station / C-Store</option><option value="multifamily">Multifamily / Apartments</option><option value="retail">Retail / Mall</option><option value="mixed-use">Mixed-Use</option><option value="industrial">Industrial / Warehouse</option><option value="office">Office</option><option value="hotel">Hotel / Hospitality</option><option value="land">Land / Development</option><option value="assisted living">Assisted Living / Senior</option><option value="other">Other</option></select></div>
+<div class="field"><label>Listing URL</label><input id="url" placeholder="https://..."></div>
+<div class="field"><label>Description</label><textarea id="description" placeholder="Brief description of the deal, key highlights, cap rate, NOI, etc."></textarea></div>
+<h3 style="margin-top:24px">Your Contact Info</h3>
+<div class="field"><label>Your Name *</label><input id="cname" placeholder="Full name"></div>
+<div class="field"><label>Email *</label><input id="cemail" type="email" placeholder="you@company.com"></div>
+<div class="field"><label>Phone</label><input id="cphone" placeholder="(210) 555-1234"></div>
+<div class="field"><label>Your Role</label>
+<select id="role"><option value="">Select...</option><option value="principal">Principal / Owner</option><option value="broker">Broker / Agent</option><option value="developer">Developer</option><option value="wholesaler">Wholesaler</option><option value="other">Other</option></select></div>
+<button class="submit-btn" id="submitBtn" onclick="submitDeal()">Submit Listing — Get Matched</button>
+<div class="result" id="result"></div>
+</div>
+</div>
+<script>
+async function submitDeal(){
+  const btn=document.getElementById('submitBtn');
+  const res=document.getElementById('result');
+  btn.disabled=true;btn.textContent='Matching...';res.style.display='none';
+  const data={name:document.getElementById('name').value.trim(),city:document.getElementById('city').value.trim(),state:document.getElementById('state').value.trim().toUpperCase(),asking_price:document.getElementById('price').value,revenue:document.getElementById('revenue').value||0,industry:document.getElementById('industry').value,url:document.getElementById('url').value.trim(),description:document.getElementById('description').value.trim(),contact_name:document.getElementById('cname').value.trim(),contact_email:document.getElementById('cemail').value.trim(),contact_phone:document.getElementById('cphone').value.trim(),role:document.getElementById('role').value};
+  if(!data.name||!data.asking_price||!data.industry||!data.contact_email){res.className='result error';res.innerHTML='<h4>Missing Fields</h4><p>Please fill in all required fields (*).</p>';res.style.display='block';btn.disabled=false;btn.textContent='Submit Listing — Get Matched';return}
+  try{
+    const r=await fetch('/api/seller/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const d=await r.json();
+    if(d.success){res.className='result success';res.innerHTML='<h4>🎯 '+d.matches_found+' Investor Matches Found!</h4><p>'+d.message+'</p>';res.style.display='block';btn.textContent='✓ Submitted'}
+    else{res.className='result error';res.innerHTML='<h4>Error</h4><p>'+(d.error||'Something went wrong.')+'</p>';res.style.display='block';btn.disabled=false;btn.textContent='Submit Listing — Get Matched'}
+  }catch(e){res.className='result error';res.innerHTML='<h4>Connection Error</h4><p>Please try again.</p>';res.style.display='block';btn.disabled=false;btn.textContent='Submit Listing — Get Matched'}
+}
+</script>
+</body>
+</html>
