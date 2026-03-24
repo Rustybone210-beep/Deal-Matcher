@@ -107,3 +107,48 @@ router.get('/status/:email', (req, res) => {
 });
 
 module.exports = router;
+
+// POST /api/seller/portal — seller logs in to see their listings + interest
+router.post('/portal', (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+
+    // Find all listings submitted by this email
+    const listings = db.prepare(
+      "SELECT l.* FROM listings l WHERE l.source = 'seller-submit' ORDER BY l.scraped_at DESC"
+    ).all();
+
+    // For now match by source, later we add seller_email column
+    // Get match and interest data for each listing
+    const enriched = listings.map(l => {
+      const match_count = db.prepare('SELECT COUNT(*) as c FROM matches WHERE listing_id = ? AND score >= 50').get(l.id).c;
+      const interested = db.prepare(
+        "SELECT o.status, i.contact_name as name, i.firm_name as firm, m.score FROM outreach o JOIN investors i ON i.id = o.investor_id JOIN matches m ON m.id = o.match_id WHERE o.listing_id = ? AND o.status = 'interested'"
+      ).all(l.id);
+      return { ...l, match_count, interested_count: interested.length, interested_investors: interested };
+    });
+
+    const total_matches = enriched.reduce((sum, l) => sum + l.match_count, 0);
+
+    res.json({
+      success: true,
+      contact_name: email.split('@')[0],
+      listings: enriched,
+      total_matches
+    });
+  } catch (e) {
+    console.error('[SELLER PORTAL]', e.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT /api/seller/status — update listing status
+router.put('/status', (req, res) => {
+  try {
+    const { listing_id, status } = req.body;
+    if (!listing_id || !status) return res.status(400).json({ error: 'Missing listing_id or status' });
+    db.prepare('UPDATE listings SET status = ? WHERE id = ?').run(status, listing_id);
+    res.json({ success: true, message: 'Status updated to ' + status });
+  } catch (e) { res.status(500).json({ error: 'Update failed' }); }
+});

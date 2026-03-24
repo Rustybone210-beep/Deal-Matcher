@@ -36,9 +36,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRouter);
 const portalRoutes = require('./routes/portal');
 const sellerRoutes = require('./routes/seller');
+const agreementsRoutes = require('./routes/agreements');
 app.use('/api/subscribe', subscribeRoutes);
 app.use('/api/portal', portalRoutes);
 app.use('/api/seller', sellerRoutes);
+app.use('/api/agreements', agreementsRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, app: 'DealMatcher', time: new Date().toISOString() });
@@ -74,6 +76,18 @@ cron.schedule('0 13 * * 1', async () => {
     console.error('[CRON] Digest failed:', e.message);
   }
 });
+
+
+// Auto-scrape cron: check for new CSV files daily at 6am CST
+const cron = require('node-cron');
+try {
+  const { watchForCSVs } = require('./scripts/auto-scrape');
+  cron.schedule('0 11 * * *', () => {
+    console.log('[CRON] Running auto-scrape CSV watcher');
+    watchForCSVs();
+  });
+  console.log('[CRON] Auto-scrape scheduled for 6am CST daily');
+} catch(e) { console.log('[CRON] Auto-scrape setup skipped:', e.message); }
 
 app.listen(PORT, () => {
   console.log('\n🎯 DealMatcher running on http://localhost:' + PORT + '\n');
