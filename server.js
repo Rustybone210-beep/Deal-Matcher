@@ -79,7 +79,6 @@ cron.schedule('0 13 * * 1', async () => {
 
 
 // Auto-scrape cron: check for new CSV files daily at 6am CST
-const cron = require('node-cron');
 try {
   const { watchForCSVs } = require('./scripts/auto-scrape');
   cron.schedule('0 11 * * *', () => {
