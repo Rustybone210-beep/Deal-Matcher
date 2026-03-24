@@ -37,10 +37,12 @@ app.use('/api/auth', authRouter);
 const portalRoutes = require('./routes/portal');
 const sellerRoutes = require('./routes/seller');
 const agreementsRoutes = require('./routes/agreements');
+const agentRoutes = require('./routes/agent');
 app.use('/api/subscribe', subscribeRoutes);
 app.use('/api/portal', portalRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/agreements', agreementsRoutes);
+app.use('/api/agent', agentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, app: 'DealMatcher', time: new Date().toISOString() });
@@ -86,6 +88,15 @@ try {
     watchForCSVs();
   });
   console.log('[CRON] Auto-scrape scheduled for 6am CST daily');
+
+  // AI Agent: runs daily at 5am CST — searches for new deals and leads
+  const { runAgent, sendDailyReport } = require('./scripts/deal-agent');
+  cron.schedule('0 10 * * *', async () => {
+    console.log('[CRON] Running AI Deal Agent');
+    const results = await runAgent();
+    await sendDailyReport(results);
+  });
+  console.log('[CRON] AI Deal Agent scheduled for 5am CST daily');
 } catch(e) { console.log('[CRON] Auto-scrape setup skipped:', e.message); }
 
 app.listen(PORT, () => {
