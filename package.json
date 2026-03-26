@@ -16,6 +16,7 @@
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.8.0",
+    "cheerio": "^1.2.0",
     "connect-sqlite3": "^0.9.16",
     "cors": "^2.8.6",
     "csv-parse": "^6.1.0",
@@ -30,6 +31,6 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.4",
     "resend": "^6.9.4",
-    "stripe": "^21.0.0"
+    "stripe": "^21.0.1"
   }
 }

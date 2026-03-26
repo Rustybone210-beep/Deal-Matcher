@@ -102,3 +102,14 @@ try {
 app.listen(PORT, () => {
   console.log('\n🎯 DealMatcher running on http://localhost:' + PORT + '\n');
 });
+
+// Bruce Agent
+const Bruce = require('./agents/bruce');
+const bruce = new Bruce(db);
+bruce.initDb();
+bruce.schedule();
+app.use('/api/bruce', require('./routes/bruce')(db, bruce));
+
+// Stripe
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+app.use('/api/stripe', require('./routes/stripe')(db));
