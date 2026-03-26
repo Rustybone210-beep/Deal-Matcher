@@ -29,7 +29,7 @@ app.get('/', (req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => { res.redirect('/subscribe.html'); });
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Public routes (no auth needed)
