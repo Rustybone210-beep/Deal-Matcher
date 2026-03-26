@@ -99,6 +99,8 @@ try {
   console.log('[CRON] AI Deal Agent scheduled for 5am CST daily');
 } catch(e) { console.log('[CRON] Auto-scrape setup skipped:', e.message); }
 
+app.get("/health", (req, res) => res.json({ status: "ok", ts: new Date().toISOString() }));
+
 app.listen(PORT, () => {
   console.log('\n🎯 DealMatcher running on http://localhost:' + PORT + '\n');
 });
