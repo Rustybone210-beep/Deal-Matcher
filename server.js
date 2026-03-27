@@ -49,6 +49,16 @@ app.use('/api/', apiLimiter);
 app.use(express.json({ limit: '4mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Prevent Cloudflare/browser from caching HTML pages (serve stale content)
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') || req.path === '/') {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
+
 // Auth check middleware for index.html
 app.get('/', (req, res, next) => {
   // Serve login page check — the frontend JS will handle redirect

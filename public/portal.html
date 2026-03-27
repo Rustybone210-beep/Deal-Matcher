@@ -18,7 +18,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .login-input{width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--bd2);border-radius:10px;color:var(--t1);font-size:16px;margin-bottom:16px;outline:none;font-family:var(--sans)}
 .login-input:focus{border-color:var(--teal)}
 .login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--bg);border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer}
+.login-btn:disabled{opacity:0.6;cursor:not-allowed}
 .login-error{color:var(--red);font-size:13px;margin-top:12px;display:none}
+.login-success{color:var(--teal);font-size:13px;margin-top:12px;display:none}
+.code-row{display:none;margin-bottom:16px}
+.code-input{width:100%;padding:16px;background:var(--bg);border:1px solid var(--bd2);border-radius:10px;color:var(--teal);font-size:28px;font-weight:700;letter-spacing:12px;text-align:center;outline:none;font-family:var(--sans)}
+.code-input:focus{border-color:var(--teal)}
+.back-link{color:var(--t3);font-size:12px;cursor:pointer;margin-top:12px;display:none}
+.back-link:hover{color:var(--t2)}
 .portal{display:none}
 .header{background:rgba(8,10,18,0.98);border-bottom:1px solid var(--bd);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .header h1{font-family:var(--serif);font-size:20px}.header h1 span{color:var(--teal)}
@@ -85,26 +92,99 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 <script defer data-domain="dealmatcherapp.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
-<div class="login-screen" id="loginScreen"><div class="login-box"><h1>Deal<span>Matcher</span></h1><p>Enter your email to view your matched deals</p><input class="login-input" id="loginEmail" type="email" placeholder="your@email.com" autofocus><button class="login-btn" onclick="portalLogin()">View My Deals</button><div class="login-error" id="loginError"></div><p style="margin-top:20px;font-size:12px;color:var(--t3)">No account? <a href="/subscribe.html" style="color:var(--teal)">Sign up free</a></p></div></div>
+<div class="login-screen" id="loginScreen"><div class="login-box"><h1>Deal<span>Matcher</span></h1><p id="loginPrompt">Enter your email to view your matched deals</p><input class="login-input" id="loginEmail" type="email" placeholder="your@email.com" autofocus><div class="code-row" id="codeRow"><input class="code-input" id="codeInput" type="text" maxlength="6" placeholder="------" inputmode="numeric" autocomplete="one-time-code"></div><button class="login-btn" id="loginBtn" onclick="portalLogin()">Send Login Code</button><div class="login-error" id="loginError"></div><div class="login-success" id="loginSuccess"></div><div class="back-link" id="backLink" onclick="resetLogin()">Use a different email</div><p style="margin-top:20px;font-size:12px;color:var(--t3)">No account? <a href="/subscribe.html" style="color:var(--teal)">Sign up free</a></p></div></div>
 <div class="portal" id="portal"><div class="header"><h1>Deal<span>Matcher</span></h1><div class="header-right"><span class="user-name" id="headerName"></span><button class="logout-btn" onclick="logout()">Log Out</button></div></div><div class="welcome-banner"><div class="welcome-name" id="welcomeName"></div><div class="welcome-sub">Your personalized deal matches, updated weekly.</div></div><div class="stats-row" id="statsRow"></div><div class="criteria-bar" id="criteriaBar"></div><div class="section-title">Your Top Matches</div><div class="deals-grid" id="dealsGrid"></div></div>
 <div class="modal-bg" id="editModal"><div class="modal"><h2>Update Your Criteria</h2><div class="field"><label>Industries</label><input id="editInd"></div><div class="field"><label>Locations</label><input id="editLoc"></div><div class="field"><label>Min Price ($)</label><input id="editMin" type="number"></div><div class="field"><label>Max Price ($)</label><input id="editMax" type="number"></div><div class="mactions"><button class="btn-cn" onclick="document.getElementById('editModal').classList.remove('open')">Cancel</button><button class="btn-sv" onclick="saveCriteria()">Save & Re-Match</button></div></div></div>
-<button class="chat-toggle" id="chatToggle" onclick="toggleChat()">💬</button>
-<div class="chat-panel" id="chatPanel"><div class="chat-hdr"><h3>DealMatcher AI</h3><button class="chat-x" onclick="toggleChat()">✕</button></div><div class="chat-msgs" id="chatMsgs"></div><div class="chat-row"><input class="chat-in" id="chatIn" placeholder="Ask about your deals..." onkeydown="if(event.key==='Enter')sendChat()"><button class="chat-go" onclick="sendChat()">Send</button></div></div>
+<button class="chat-toggle" id="chatToggle" onclick="toggleChat()">&#x1F4AC;</button>
+<div class="chat-panel" id="chatPanel"><div class="chat-hdr"><h3>DealMatcher AI</h3><button class="chat-x" onclick="toggleChat()">&#x2715;</button></div><div class="chat-msgs" id="chatMsgs"></div><div class="chat-row"><input class="chat-in" id="chatIn" placeholder="Ask about your deals..." onkeydown="if(event.key==='Enter')sendChat()"><button class="chat-go" onclick="sendChat()">Send</button></div></div>
 <div class="toast" id="toast"></div>
 <script>
 'use strict';
-let inv=null,matches=[];
+let inv=null, matches=[], portalToken=null, loginStep='email';
+
 document.getElementById('loginEmail').addEventListener('keydown',e=>{if(e.key==='Enter')portalLogin()});
-async function portalLogin(){const email=document.getElementById('loginEmail').value.trim();if(!email)return;const err=document.getElementById('loginError');err.style.display='none';try{const r=await fetch('/api/portal/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});const d=await r.json();if(!r.ok){err.textContent=d.error;err.style.display='block';return}inv=d.investor;matches=d.matches;renderPortal(d)}catch(e){err.textContent='Connection error';err.style.display='block'}}
+document.getElementById('codeInput').addEventListener('keydown',e=>{if(e.key==='Enter')portalLogin()});
+
+// Auto-advance when 6 digits entered
+document.getElementById('codeInput').addEventListener('input',e=>{
+  e.target.value=e.target.value.replace(/\D/g,'');
+  if(e.target.value.length===6) portalLogin();
+});
+
+function resetLogin(){
+  loginStep='email';
+  document.getElementById('loginEmail').style.display='';
+  document.getElementById('codeRow').style.display='none';
+  document.getElementById('backLink').style.display='none';
+  document.getElementById('loginBtn').textContent='Send Login Code';
+  document.getElementById('loginPrompt').textContent='Enter your email to view your matched deals';
+  document.getElementById('loginError').style.display='none';
+  document.getElementById('loginSuccess').style.display='none';
+  document.getElementById('loginEmail').focus();
+}
+
+async function portalLogin(){
+  const err=document.getElementById('loginError');
+  const suc=document.getElementById('loginSuccess');
+  const btn=document.getElementById('loginBtn');
+  err.style.display='none';
+  suc.style.display='none';
+
+  if(loginStep==='email'){
+    // Step 1: Request code
+    const email=document.getElementById('loginEmail').value.trim();
+    if(!email) return;
+    btn.textContent='Sending...';
+    btn.disabled=true;
+    try{
+      const r=await fetch('/api/portal/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+      const d=await r.json();
+      if(!r.ok){err.textContent=d.error;err.style.display='block';btn.textContent='Send Login Code';btn.disabled=false;return}
+      // Show code input
+      loginStep='code';
+      document.getElementById('loginEmail').style.display='none';
+      document.getElementById('codeRow').style.display='block';
+      document.getElementById('backLink').style.display='block';
+      document.getElementById('loginBtn').textContent='Verify Code';
+      document.getElementById('loginBtn').disabled=false;
+      document.getElementById('loginPrompt').textContent='Enter the 6-digit code sent to '+email;
+      suc.textContent='Code sent! Check your email.';
+      suc.style.display='block';
+      document.getElementById('codeInput').value='';
+      document.getElementById('codeInput').focus();
+    }catch(e){err.textContent='Connection error';err.style.display='block';btn.textContent='Send Login Code';btn.disabled=false}
+  } else {
+    // Step 2: Verify code
+    const email=document.getElementById('loginEmail').value.trim();
+    const code=document.getElementById('codeInput').value.trim();
+    if(!code||code.length!==6) return;
+    btn.textContent='Verifying...';
+    btn.disabled=true;
+    try{
+      const r=await fetch('/api/portal/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code})});
+      const d=await r.json();
+      if(!r.ok){err.textContent=d.error;err.style.display='block';suc.style.display='none';btn.textContent='Verify Code';btn.disabled=false;if(d.error.includes('expired'))resetLogin();return}
+      inv=d.investor;
+      matches=d.matches;
+      portalToken=d.token;
+      renderPortal(d);
+    }catch(e){err.textContent='Connection error';err.style.display='block';btn.textContent='Verify Code';btn.disabled=false}
+  }
+}
+
+function authHeaders(){
+  return {'Content-Type':'application/json','x-portal-token':portalToken||''};
+}
+
 function renderPortal(d){document.getElementById('loginScreen').style.display='none';document.getElementById('portal').style.display='block';document.getElementById('chatToggle').style.display='flex';document.getElementById('headerName').textContent=inv.name;document.getElementById('welcomeName').textContent='Welcome back, '+inv.name.split(' ')[0];document.getElementById('statsRow').innerHTML='<div class="stat-box"><div class="stat-num">'+d.stats.totalMatches+'</div><div class="stat-lbl">Total Matches</div></div><div class="stat-box"><div class="stat-num">'+d.stats.strongMatches+'</div><div class="stat-lbl">Strong (50+)</div></div><div class="stat-box"><div class="stat-num">'+d.matches.length+'</div><div class="stat-lbl">Showing</div></div>';document.getElementById('criteriaBar').innerHTML='<div style="display:flex;gap:16px;flex-wrap:wrap"><div class="criteria-item">Industries: <strong>'+(inv.industries||'All')+'</strong></div><div class="criteria-item">Locations: <strong>'+(inv.locations||'All')+'</strong></div><div class="criteria-item">Range: <strong>$'+fmt(inv.min_price)+' – $'+fmt(inv.max_price)+'</strong></div></div><button class="edit-btn" onclick="openEdit()">Edit Criteria</button>';renderDeals(d.matches);setTimeout(()=>{addMsg('ai','Welcome back, '+inv.name.split(' ')[0]+'! I found '+d.stats.strongMatches+' strong matches for you. Browse below and click "I\'m Interested" on any deal to start the introduction process.')},800)}
-function renderDeals(m){const g=document.getElementById('dealsGrid');if(!m.length){g.innerHTML='<div style="text-align:center;padding:48px;color:var(--t3);grid-column:1/-1">No matches yet. We\'re scanning for deals.</div>';return}g.innerHTML=m.map(d=>{const sc=d.score>=70?'var(--teal)':d.score>=50?'var(--gold)':'var(--t2)';return'<div class="deal-card"><div class="deal-name">'+esc(d.name)+'</div><div class="deal-location">'+esc([d.city,d.state].filter(Boolean).join(', '))+'</div><div class="deal-price">$'+fmt(d.asking_price)+'</div><div class="deal-meta"><span class="deal-badge badge-ind">'+esc(d.industry||'Commercial')+'</span><span class="deal-badge badge-score" style="color:'+sc+'">Score: '+d.score+'</span>'+(d.revenue>0?'<span style="font-size:11px;color:var(--t3)">Rev: $'+fmt(d.revenue)+'/yr</span>':'')+'</div><div class="deal-actions">'+(d.url?'<a href="'+esc(d.url)+'" target="_blank" class="deal-link">View Listing ↗</a>':'')+'<button class="interest-btn" id="int-'+d.listing_id+'" onclick="markInt('+d.listing_id+',\''+esc(d.name).replace(/'/g,"\\'")+'\')">I\'m Interested</button></div></div>'}).join('')}
-async function markInt(lid,ln){const btn=document.getElementById('int-'+lid);if(btn.classList.contains('sent'))return;btn.textContent='Sending...';btn.disabled=true;try{const r=await fetch('/api/portal/interested',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({investor_id:inv.id,listing_id:lid})});const d=await r.json();if(d.success){btn.textContent='✓ Interest Sent';btn.classList.add('sent');toast('Interest registered! We\'ll contact you within 24 hours.');addMsg('ai','Great choice! I\'ve flagged your interest in '+ln+'. Our team will reach out within 24 hours.')}}catch(e){btn.textContent="I'm Interested";btn.disabled=false}}
+function renderDeals(m){const g=document.getElementById('dealsGrid');if(!m.length){g.innerHTML='<div style="text-align:center;padding:48px;color:var(--t3);grid-column:1/-1">No matches yet. We\'re scanning for deals.</div>';return}g.innerHTML=m.map(d=>{const sc=d.score>=70?'var(--teal)':d.score>=50?'var(--gold)':'var(--t2)';return'<div class="deal-card"><div class="deal-name">'+esc(d.name)+'</div><div class="deal-location">'+esc([d.city,d.state].filter(Boolean).join(', '))+'</div><div class="deal-price">$'+fmt(d.asking_price)+'</div><div class="deal-meta"><span class="deal-badge badge-ind">'+esc(d.industry||'Commercial')+'</span><span class="deal-badge badge-score" style="color:'+sc+'">Score: '+d.score+'</span>'+(d.revenue>0?'<span style="font-size:11px;color:var(--t3)">Rev: $'+fmt(d.revenue)+'/yr</span>':'')+'</div><div class="deal-actions">'+(d.url?'<a href="'+esc(d.url)+'" target="_blank" class="deal-link">View Listing &#x2197;</a>':'')+'<button class="interest-btn" id="int-'+d.listing_id+'" onclick="markInt('+d.listing_id+',\''+esc(d.name).replace(/'/g,"\\'")+'\')">I\'m Interested</button></div></div>'}).join('')}
+async function markInt(lid,ln){const btn=document.getElementById('int-'+lid);if(btn.classList.contains('sent'))return;btn.textContent='Sending...';btn.disabled=true;try{const r=await fetch('/api/portal/interested',{method:'POST',headers:authHeaders(),body:JSON.stringify({listing_id:lid})});const d=await r.json();if(d.success){btn.textContent='Interest Sent';btn.classList.add('sent');toast('Interest registered! We\'ll contact you within 24 hours.');addMsg('ai','Great choice! I\'ve flagged your interest in '+ln+'. Our team will reach out within 24 hours.')}}catch(e){btn.textContent="I'm Interested";btn.disabled=false}}
 function openEdit(){document.getElementById('editInd').value=inv.industries||'';document.getElementById('editLoc').value=inv.locations||'';document.getElementById('editMin').value=inv.min_price||'';document.getElementById('editMax').value=inv.max_price||'';document.getElementById('editModal').classList.add('open')}
-async function saveCriteria(){const d={email:inv.email,industries:document.getElementById('editInd').value,locations:document.getElementById('editLoc').value,min_price:document.getElementById('editMin').value||null,max_price:document.getElementById('editMax').value||null};await fetch('/api/portal/update',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});document.getElementById('editModal').classList.remove('open');toast('Criteria updated!');portalLogin()}
+async function saveCriteria(){const d={industries:document.getElementById('editInd').value,locations:document.getElementById('editLoc').value,min_price:document.getElementById('editMin').value||null,max_price:document.getElementById('editMax').value||null};await fetch('/api/portal/update',{method:'PUT',headers:authHeaders(),body:JSON.stringify(d)});document.getElementById('editModal').classList.remove('open');toast('Criteria updated!')}
 function toggleChat(){document.getElementById('chatPanel').classList.toggle('open')}
 function addMsg(role,text){const el=document.getElementById('chatMsgs');const d=document.createElement('div');d.className='cmsg '+role;if(role==='ai')d.innerHTML='<div class="ai-n">DealMatcher AI</div>'+esc(text);else d.textContent=text;el.appendChild(d);el.scrollTop=el.scrollHeight}
-async function sendChat(){const i=document.getElementById('chatIn');const msg=i.value.trim();if(!msg)return;i.value='';addMsg('user',msg);const ms=matches.slice(0,5).map(m=>m.name+' ($'+fmt(m.asking_price)+')').join('; ');try{const r=await fetch('/api/portal/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,investor_name:inv.name,investor_criteria:inv.industries+' in '+inv.locations,matches_summary:ms})});const d=await r.json();addMsg('ai',d.reply)}catch(e){addMsg('ai','Connection issue. Try again.')}}
-function logout(){inv=null;matches=[];document.getElementById('portal').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('chatToggle').style.display='none';document.getElementById('chatPanel').classList.remove('open');document.getElementById('chatMsgs').innerHTML=''}
+async function sendChat(){const i=document.getElementById('chatIn');const msg=i.value.trim();if(!msg)return;i.value='';addMsg('user',msg);const ms=matches.slice(0,5).map(m=>m.name+' ($'+fmt(m.asking_price)+')').join('; ');try{const r=await fetch('/api/portal/chat',{method:'POST',headers:authHeaders(),body:JSON.stringify({message:msg,investor_name:inv.name,investor_criteria:inv.industries+' in '+inv.locations,matches_summary:ms})});const d=await r.json();addMsg('ai',d.reply)}catch(e){addMsg('ai','Connection issue. Try again.')}}
+function logout(){inv=null;matches=[];portalToken=null;document.getElementById('portal').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('chatToggle').style.display='none';document.getElementById('chatPanel').classList.remove('open');document.getElementById('chatMsgs').innerHTML='';resetLogin()}
 function fmt(n){if(!n&&n!==0)return'0';return Number(n).toLocaleString('en-US',{maximumFractionDigits:0})}
 function esc(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4000)}
