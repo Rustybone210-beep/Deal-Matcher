@@ -51,8 +51,11 @@ module.exports = (db) => {
     const sig = req.headers['stripe-signature'];
     let event;
     try {
+      if (!process.env.STRIPE_WEBHOOK_SECRET) {
+        return res.status(500).send('Webhook secret not configured');
+      }
       event = stripe.webhooks.constructEvent(
-        req.body, sig, process.env.STRIPE_WEBHOOK_SECRET || ''
+        req.body, sig, process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
       console.error('[STRIPE WEBHOOK]', err.message);
@@ -60,7 +63,7 @@ module.exports = (db) => {
     }
 
     try {
-      if (event.type === 'checkout.session.completed') {
+      if (event.type === 'checkout.session.completed' || event.type === 'payment_intent.succeeded') {
         const session = event.data.object;
         const plan = session.metadata?.plan || 'pro';
         const email = session.customer_email || session.customer_details?.email;
@@ -99,7 +102,7 @@ module.exports = (db) => {
         db.prepare(`UPDATE users SET role=? WHERE email=?`).run(plan, email);
       }
 
-      if (event.type === 'customer.subscription.deleted') {
+      if (event.type === 'customer.subscription.deleted' || event.type === 'subscription_schedule.canceled') {
         const sub = event.data.object;
         db.prepare(`UPDATE subscriptions SET plan='free', status='cancelled', updated_at=datetime('now') WHERE stripe_subscription_id=?`).run(sub.id);
       }

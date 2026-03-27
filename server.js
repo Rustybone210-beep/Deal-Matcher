@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const cron = require('node-cron');
 const { initDb, db } = require('./db/database');
 const listingsRoutes = require('./routes/listings');
@@ -14,12 +15,37 @@ const { router: authRouter, requireAuth } = require('./routes/auth');
 const { router: digestRouter, sendDigestForAll } = require('./routes/digest');
 const { runMatchingForAll } = require('./matcher/engine');
 
+// Validate critical env vars on startup
+const REQUIRED_ENV = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'RESEND_API_KEY'];
+for (const key of REQUIRED_ENV) {
+  if (!process.env[key]) console.error(`[STARTUP] WARNING: Missing required env var: ${key}`);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 initDb();
 
-app.use(cors());
+// CORS — restrict to known origins
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3001',
+].filter(Boolean);
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
+
+// Rate limiting
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 15, message: { error: 'Too many attempts. Try again in 15 minutes.' } });
+const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 100 });
+app.use('/api/auth/login', authLimiter);
+app.use('/api/portal/login', authLimiter);
+app.use('/api/', apiLimiter);
+
 app.use(express.json({ limit: '4mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -98,8 +124,6 @@ try {
   });
   console.log('[CRON] AI Deal Agent scheduled for 5am CST daily');
 } catch(e) { console.log('[CRON] Auto-scrape setup skipped:', e.message); }
-
-app.get("/health", (req, res) => res.json({ status: "ok", ts: new Date().toISOString() }));
 
 app.listen(PORT, () => {
   console.log('\n🎯 DealMatcher running on http://localhost:' + PORT + '\n');

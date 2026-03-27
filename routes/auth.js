@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
-const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'dealmatcher2026';
+const ADMIN_HASH = process.env.ADMIN_PASSWORD_HASH || '$2b$12$fPE0z7TgXjy4fuDY2yD/kenNfGqIxh.ug9ULUjdlBofNYAFXcuR5u';
 const sessions = new Map();
 
 function generateToken() {
@@ -10,9 +11,11 @@ function generateToken() {
 }
 
 // Login endpoint
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { password } = req.body;
-  if (password === ADMIN_PASS) {
+  if (!password) return res.status(400).json({ error: 'Password required' });
+  const valid = await bcrypt.compare(password, ADMIN_HASH);
+  if (valid) {
     const token = generateToken();
     sessions.set(token, { created: Date.now() });
     // Clean old sessions (older than 24h)
