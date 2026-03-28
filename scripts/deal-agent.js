@@ -8,174 +8,174 @@ const { runMatchingForAll } = require('../matcher/engine');
 // ============================================
 
 const SEARCH_QUERIES = {
-  gas_station: [
-    'gas station for sale NNN',
-    '7-eleven for sale NNN lease',
-    'convenience store for sale',
-    'gas station NNN triple net',
-    'wawa for sale NNN',
-    'shell gas station for sale'
-  ],
-  multifamily: [
-    'apartment complex for sale',
-    'multifamily for sale 20 units',
-    'multifamily portfolio for sale',
-    'apartment building for sale',
-    'BTR townhomes for sale'
-  ],
-  retail: [
-    'retail center for sale NNN',
-    'strip mall for sale',
-    'shopping center for sale',
-    'retail plaza for sale'
-  ]
+  gas_station: ['gas station for sale', 'convenience store for sale', 'gas station NNN'],
+  multifamily: ['apartment complex for sale', 'multifamily for sale', 'apartment building for sale'],
+  retail: ['retail center for sale', 'strip mall for sale', 'shopping center for sale'],
+  restaurant: ['restaurant for sale', 'franchise for sale'],
+  healthcare: ['medical practice for sale', 'dental practice for sale', 'pharmacy for sale'],
+  industrial: ['warehouse for sale', 'manufacturing business for sale'],
 };
 
 const INVESTOR_SEARCH_QUERIES = [
   'looking to buy gas station',
   'looking to buy apartment complex',
-  'looking to acquire commercial real estate',
-  'seeking multifamily investment',
+  'seeking commercial real estate deals',
   'investor seeking NNN properties',
-  'looking to buy convenience store',
-  'want to purchase gas station',
-  'seeking commercial real estate deals'
+  'want to purchase business',
+  'looking to acquire franchise',
 ];
 
-// Track what we've already processed
-db.exec(`CREATE TABLE IF NOT EXISTS agent_log (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  source TEXT,
-  query TEXT,
-  results_found INTEGER DEFAULT 0,
-  leads_added INTEGER DEFAULT 0,
-  listings_added INTEGER DEFAULT 0,
-  run_at TEXT DEFAULT CURRENT_TIMESTAMP
-)`);
-
-db.exec(`CREATE TABLE IF NOT EXISTS agent_leads (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
-  email TEXT,
-  phone TEXT,
-  source TEXT,
-  source_url TEXT,
-  interest TEXT,
-  location TEXT,
-  budget TEXT,
-  status TEXT DEFAULT 'new',
-  notes TEXT,
-  found_at TEXT DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(email)
-)`);
-
 // ============================================
-// SEC EDGAR — Find new real estate fund filings
+// LoopNet / Crexi via Google Search API
 // ============================================
-async function searchSECEdgar() {
-  console.log('[AGENT] Searching SEC EDGAR for RE fund filings...');
-  try {
-    const response = await fetch('https://efts.sec.gov/LATEST/search-index?q=%22real+estate%22+%22fund%22&dateRange=custom&startdt=2026-01-01&forms=D', {
-      headers: { 'User-Agent': 'DealMatcher/1.0 fields@dealmatcherapp.com' }
-    });
-    if (response.ok) {
-      const text = await response.text();
-      console.log('[AGENT] SEC EDGAR response received, length:', text.length);
-      // Parse for fund names, managers, locations
-      // These are real people raising capital for RE
-    }
-  } catch (e) {
-    console.log('[AGENT] SEC EDGAR search:', e.message);
-  }
-  return [];
-}
-
-// ============================================
-// Crexi Public Search
-// ============================================
-async function searchCrexi(query, industry) {
-  console.log('[AGENT] Searching Crexi:', query);
-  const now = new Date().toISOString();
+async function searchListingSites(query, industry) {
+  console.log('[AGENT] Searching listings:', query);
   let added = 0;
+  const now = new Date().toISOString();
+
+  // Use DuckDuckGo HTML search (no API key needed)
   try {
-    const searchUrl = `https://www.crexi.com/properties?searchText=${encodeURIComponent(query)}`;
+    const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query + ' for sale site:crexi.com OR site:loopnet.com OR site:bizbuysell.com')}`;
     const response = await fetch(searchUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)' }
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' }
     });
+
     if (response.ok) {
       const html = await response.text();
-      // Extract property listings from HTML
-      const nameMatches = html.match(/"propertyName":"([^"]+)"/g) || [];
-      const priceMatches = html.match(/"listPrice":(\d+)/g) || [];
-      const cityMatches = html.match(/"city":"([^"]+)"/g) || [];
-      const stateMatches = html.match(/"state":"([^"]+)"/g) || [];
-      const urlMatches = html.match(/"propertyUrl":"([^"]+)"/g) || [];
+      // Extract result URLs and titles
+      const results = [];
+      const linkMatches = html.match(/<a[^>]+class="result__a"[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/gi) || [];
 
-      for (let i = 0; i < Math.min(nameMatches.length, 10); i++) {
-        try {
-          const name = nameMatches[i]?.replace(/"propertyName":"/, '').replace(/"$/, '') || '';
-          const price = priceMatches[i]?.replace(/"listPrice":/, '') || '0';
-          const city = cityMatches[i]?.replace(/"city":"/, '').replace(/"$/, '') || '';
-          const state = stateMatches[i]?.replace(/"state":"/, '').replace(/"$/, '') || '';
-          const url = urlMatches[i]?.replace(/"propertyUrl":"/, '').replace(/"$/, '') || '';
+      for (const match of linkMatches) {
+        const urlMatch = match.match(/href="([^"]+)"/);
+        const titleMatch = match.match(/>([^<]+)<\/a>/);
+        if (urlMatch && titleMatch) {
+          let url = urlMatch[1];
+          // DuckDuckGo wraps URLs
+          const uddg = url.match(/uddg=([^&]+)/);
+          if (uddg) url = decodeURIComponent(uddg[1]);
+          const title = titleMatch[1].trim();
 
-          if (name && parseFloat(price) > 0) {
-            try {
-              db.prepare('INSERT INTO listings (name,city,state,asking_price,revenue,industry,url,source,status,scraped_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
-                .run(name, city, state, parseFloat(price), 0, industry, 'https://www.crexi.com' + url, 'agent-crexi', 'new', now);
-              added++;
-            } catch (e) { /* duplicate */ }
+          if ((url.includes('crexi.com') || url.includes('loopnet.com') || url.includes('bizbuysell.com')) && title.length > 10) {
+            results.push({ title, url });
           }
-        } catch (e) {}
-      }
-    }
-  } catch (e) {
-    console.log('[AGENT] Crexi search error:', e.message);
-  }
-  console.log('[AGENT] Crexi added:', added, 'listings for', query);
-  return added;
-}
-
-// ============================================
-// BizBuySell Public Search
-// ============================================
-async function searchBizBuySell(query, industry) {
-  console.log('[AGENT] Searching BizBuySell:', query);
-  let added = 0;
-  const now = new Date().toISOString();
-  try {
-    const searchUrl = `https://www.bizbuysell.com/businesses-for-sale/${encodeURIComponent(query.replace(/ /g, '-'))}/`;
-    const response = await fetch(searchUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)' }
-    });
-    if (response.ok) {
-      const html = await response.text();
-      // Extract listing data
-      const titles = html.match(/<h2[^>]*class="[^"]*listing-title[^"]*"[^>]*>([^<]+)<\/h2>/gi) || [];
-      const prices = html.match(/Asking Price:\s*\$[\d,]+/gi) || [];
-
-      console.log('[AGENT] BizBuySell found:', titles.length, 'potential listings');
-      for (let i = 0; i < Math.min(titles.length, 10); i++) {
-        const name = titles[i]?.replace(/<[^>]+>/g, '').trim();
-        const priceStr = prices[i]?.replace(/[^0-9]/g, '') || '0';
-        if (name && parseFloat(priceStr) > 0) {
-          try {
-            db.prepare('INSERT INTO listings (name,city,state,asking_price,revenue,industry,url,source,status,scraped_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
-              .run(name, '', '', parseFloat(priceStr), 0, industry, searchUrl, 'agent-bizbuysell', 'new', now);
-            added++;
-          } catch (e) { /* duplicate */ }
         }
       }
+
+      // Extract price from titles
+      for (const r of results.slice(0, 15)) {
+        const priceMatch = r.title.match(/\$[\d,]+(?:\.\d+)?[KkMm]?/);
+        let price = 0;
+        if (priceMatch) {
+          let priceStr = priceMatch[0].replace(/[$,]/g, '');
+          if (priceStr.match(/[Kk]$/)) price = parseFloat(priceStr) * 1000;
+          else if (priceStr.match(/[Mm]$/)) price = parseFloat(priceStr) * 1000000;
+          else price = parseFloat(priceStr);
+        }
+
+        // Extract location from title
+        const stateMatch = r.title.match(/,\s*([A-Z]{2})\b/);
+        const cityMatch = r.title.match(/in\s+([A-Za-z\s]+),/);
+
+        try {
+          db.prepare('INSERT INTO listings (name, city, state, asking_price, revenue, industry, url, source, status, scraped_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+            .run(
+              r.title.substring(0, 200),
+              cityMatch ? cityMatch[1].trim() : '',
+              stateMatch ? stateMatch[1] : '',
+              price,
+              0,
+              industry,
+              r.url,
+              'agent-search',
+              'new',
+              now
+            );
+          added++;
+        } catch (e) { /* duplicate URL */ }
+      }
     }
   } catch (e) {
-    console.log('[AGENT] BizBuySell search error:', e.message);
+    console.log('[AGENT] Search error:', e.message);
   }
-  console.log('[AGENT] BizBuySell added:', added, 'listings');
+
+  console.log('[AGENT] Added:', added, 'listings for', query);
   return added;
 }
 
 // ============================================
-// Reddit/BiggerPockets — Find buyer leads
+// BizBuySell RSS Feeds (most reliable)
+// ============================================
+async function searchBizBuySellRSS(industry) {
+  console.log('[AGENT] Checking BizBuySell RSS for:', industry);
+  let added = 0;
+  const now = new Date().toISOString();
+
+  const categoryMap = {
+    gas_station: 'gas-stations',
+    retail: 'retail',
+    restaurant: 'restaurants-and-food',
+    healthcare: 'health-care-and-fitness',
+    industrial: 'manufacturing',
+    multifamily: 'real-estate',
+  };
+
+  const cat = categoryMap[industry] || industry;
+
+  try {
+    const url = `https://www.bizbuysell.com/rss/${cat}-businesses-for-sale/`;
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'DealMatcher/1.0 fields@dealmatcherapp.com' }
+    });
+
+    if (response.ok) {
+      const xml = await response.text();
+      // Parse RSS items
+      const items = xml.match(/<item>([\s\S]*?)<\/item>/gi) || [];
+
+      for (const item of items.slice(0, 20)) {
+        const title = (item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/) || [])[1] || '';
+        const link = (item.match(/<link>(.*?)<\/link>/) || [])[1] || '';
+        const desc = (item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/) || [])[1] || '';
+
+        if (!title || !link) continue;
+
+        // Extract price
+        const priceMatch = (title + ' ' + desc).match(/\$[\d,]+(?:\.\d+)?/);
+        let price = 0;
+        if (priceMatch) price = parseFloat(priceMatch[0].replace(/[$,]/g, ''));
+
+        // Extract location
+        const locMatch = desc.match(/([A-Za-z\s]+),\s*([A-Z]{2})/);
+
+        try {
+          db.prepare('INSERT INTO listings (name, city, state, asking_price, revenue, industry, url, source, status, scraped_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+            .run(
+              title.substring(0, 200),
+              locMatch ? locMatch[1].trim() : '',
+              locMatch ? locMatch[2] : '',
+              price,
+              0,
+              industry,
+              link,
+              'agent-bizbuysell-rss',
+              'new',
+              now
+            );
+          added++;
+        } catch (e) { /* duplicate */ }
+      }
+    }
+  } catch (e) {
+    console.log('[AGENT] BizBuySell RSS error:', e.message);
+  }
+
+  console.log('[AGENT] BizBuySell RSS added:', added, 'for', industry);
+  return added;
+}
+
+// ============================================
+// Reddit — Find buyer leads
 // ============================================
 async function searchRedditForBuyers() {
   console.log('[AGENT] Searching Reddit for buyer leads...');
@@ -186,7 +186,7 @@ async function searchRedditForBuyers() {
     try {
       const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=new&t=week&limit=10`;
       const response = await fetch(url, {
-        headers: { 'User-Agent': 'DealMatcher/1.0' }
+        headers: { 'User-Agent': 'DealMatcher/1.0 fields@dealmatcherapp.com' }
       });
       if (response.ok) {
         const data = await response.json();
@@ -198,35 +198,16 @@ async function searchRedditForBuyers() {
               db.prepare('INSERT INTO agent_leads (name, source, source_url, interest, notes, found_at) VALUES (?, ?, ?, ?, ?, ?)')
                 .run('u/' + d.author, 'reddit', 'https://reddit.com' + d.permalink, query, d.title.substring(0, 200), now);
               found++;
-            } catch (e) { /* duplicate or error */ }
+            } catch (e) { /* duplicate */ }
           }
         }
       }
     } catch (e) {
-      console.log('[AGENT] Reddit search error:', e.message);
+      console.log('[AGENT] Reddit error:', e.message);
     }
-    // Rate limit
     await new Promise(r => setTimeout(r, 1000));
   }
-  console.log('[AGENT] Reddit found:', found, 'potential buyer leads');
-  return found;
-}
-
-// ============================================
-// County Records — Bexar County (San Antonio)
-// ============================================
-async function searchCountyRecords() {
-  console.log('[AGENT] Checking Bexar County records...');
-  let found = 0;
-  try {
-    // Bexar County real property search
-    const url = 'https://bexar.trueautomation.com/clientdb/PropertySearch.aspx';
-    console.log('[AGENT] Bexar County URL:', url);
-    console.log('[AGENT] Note: County records require manual search or specialized scraper');
-    // In production, this would use a headless browser to search recent commercial sales
-  } catch (e) {
-    console.log('[AGENT] County records:', e.message);
-  }
+  console.log('[AGENT] Reddit found:', found, 'leads');
   return found;
 }
 
@@ -242,39 +223,33 @@ async function runAgent() {
   let totalListings = 0;
   let totalLeads = 0;
 
-  // 1. Search Crexi for each category
+  // 1. Search via DuckDuckGo for each category
   for (const [industry, queries] of Object.entries(SEARCH_QUERIES)) {
     for (const q of queries) {
-      const added = await searchCrexi(q, industry);
+      const added = await searchListingSites(q, industry);
       totalListings += added;
-      await new Promise(r => setTimeout(r, 2000)); // Rate limit
+      await new Promise(r => setTimeout(r, 3000)); // Rate limit
     }
   }
 
-  // 2. Search BizBuySell
-  for (const [industry, queries] of Object.entries(SEARCH_QUERIES)) {
-    for (const q of queries.slice(0, 2)) { // Limit to avoid rate limiting
-      const added = await searchBizBuySell(q, industry);
-      totalListings += added;
-      await new Promise(r => setTimeout(r, 2000));
-    }
+  // 2. BizBuySell RSS feeds
+  for (const industry of Object.keys(SEARCH_QUERIES)) {
+    const added = await searchBizBuySellRSS(industry);
+    totalListings += added;
+    await new Promise(r => setTimeout(r, 2000));
   }
 
-  // 3. Search Reddit for buyer leads
+  // 3. Reddit buyer leads
   totalLeads += await searchRedditForBuyers();
 
-  // 4. Search SEC EDGAR
-  await searchSECEdgar();
-
-  // 5. Check county records
-  await searchCountyRecords();
-
-  // 6. Re-run matching engine
+  // 4. Re-run matching
   const matches = runMatchingForAll();
 
-  // 7. Log the run
-  db.prepare('INSERT INTO agent_log (source, query, results_found, leads_added, listings_added) VALUES (?, ?, ?, ?, ?)')
-    .run('full-run', 'all', totalListings + totalLeads, totalLeads, totalListings);
+  // 5. Log the run
+  try {
+    db.prepare('INSERT INTO agent_log (source, query, results_found, leads_added, listings_added) VALUES (?, ?, ?, ?, ?)')
+      .run('full-run', 'all', totalListings + totalLeads, totalLeads, totalListings);
+  } catch (e) {}
 
   console.log('===========================================');
   console.log('[AGENT] Run Complete');
@@ -287,26 +262,32 @@ async function runAgent() {
 }
 
 // ============================================
-// DAILY REPORT — Email summary to J
+// DAILY REPORT
 // ============================================
 async function sendDailyReport(results) {
   try {
     const { Resend } = require('resend');
     require('dotenv').config();
+    if (!process.env.RESEND_API_KEY) return;
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const reportEmail = process.env.REPORT_EMAIL || 'fields@dealmatcherapp.com';
 
     const totalListings = db.prepare('SELECT COUNT(*) as c FROM listings').get().c;
     const totalMatches = db.prepare('SELECT COUNT(*) as c FROM matches').get().c;
     const totalInvestors = db.prepare('SELECT COUNT(*) as c FROM investors').get().c;
-    const todayLeads = db.prepare("SELECT COUNT(*) as c FROM agent_leads WHERE found_at > datetime('now', '-1 day')").get().c;
-    const todayListings = db.prepare("SELECT COUNT(*) as c FROM listings WHERE scraped_at > datetime('now', '-1 day')").get().c;
+    let todayLeads = 0;
+    let todayListings = 0;
+    try {
+      todayLeads = db.prepare("SELECT COUNT(*) as c FROM agent_leads WHERE found_at > datetime('now', '-1 day')").get().c;
+      todayListings = db.prepare("SELECT COUNT(*) as c FROM listings WHERE scraped_at > datetime('now', '-1 day')").get().c;
+    } catch (e) {}
 
     await resend.emails.send({
-      from: 'DealMatcher <fields@dealmatcherapp.com>',
-      to: 'fields@dealmatcherapp.com',
-      subject: '📊 Daily Agent Report: ' + todayListings + ' new listings, ' + todayLeads + ' new leads',
+      from: process.env.FROM_EMAIL || 'DealMatcher <fields@dealmatcherapp.com>',
+      to: reportEmail,
+      subject: 'Daily Agent Report: ' + todayListings + ' new listings, ' + todayLeads + ' new leads',
       html: `<div style="font-family:Arial;max-width:600px;margin:0 auto;background:#1a1a2e;color:#e0e0e0;padding:30px;border-radius:12px;">
-        <h1 style="color:#00d4aa;">📊 Daily Agent Report</h1>
+        <h1 style="color:#00d4aa;">Daily Agent Report</h1>
         <p style="color:#888;">${new Date().toLocaleDateString()}</p>
         <div style="background:#16213e;padding:20px;border-radius:8px;margin:12px 0;">
           <h3 style="color:#00d4aa;">Today's Activity</h3>
@@ -319,7 +300,7 @@ async function sendDailyReport(results) {
           <p>Total Matches: <strong style="color:#fff;">${totalMatches}</strong></p>
           <p>Total Investors: <strong style="color:#fff;">${totalInvestors}</strong></p>
         </div>
-        <p style="color:#888;font-size:12px;">DealMatcher AI Agent • Automated Report</p></div>`
+        <p style="color:#888;font-size:12px;">DealMatcher AI Agent</p></div>`
     });
     console.log('[AGENT] Daily report sent');
   } catch (e) {
@@ -327,11 +308,10 @@ async function sendDailyReport(results) {
   }
 }
 
-// Run if called directly
 if (require.main === module) {
   runAgent().then(results => {
     sendDailyReport(results).then(() => process.exit(0));
   });
 } else {
-  module.exports = { runAgent, sendDailyReport, searchCrexi, searchBizBuySell, searchRedditForBuyers, searchSECEdgar };
+  module.exports = { runAgent, sendDailyReport };
 }

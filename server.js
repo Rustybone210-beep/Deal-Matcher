@@ -84,6 +84,31 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, app: 'DealMatcher', time: new Date().toISOString() });
 });
 
+// Admin: manually trigger agent, matching, and outreach
+app.post('/api/admin/run-agent', requireAuth, async (req, res) => {
+  try {
+    const { runAgent, sendDailyReport } = require('./scripts/deal-agent');
+    console.log('[ADMIN] Manually triggering deal agent...');
+    const results = await runAgent();
+    const outreachGenerated = autoGenerateOutreach();
+    await sendDailyReport(results);
+    res.json({ success: true, ...results, outreachGenerated });
+  } catch (e) {
+    console.error('[ADMIN] Agent run failed:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/admin/run-matching', requireAuth, (req, res) => {
+  try {
+    const matches = runMatchingForAll();
+    const outreach = autoGenerateOutreach();
+    res.json({ success: true, totalMatches: matches, outreachGenerated: outreach });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Protected routes (auth required)
 app.use('/api/listings', requireAuth, listingsRoutes);
 app.use('/api/investors', requireAuth, investorsRoutes);
@@ -92,12 +117,59 @@ app.use('/api/admin', requireAuth, adminRoutes);
 app.use('/api/outreach', requireAuth, outreachRoutes);
 app.use('/api/digest', requireAuth, digestRouter);
 
-// Daily matching cron
+// Auto-generate outreach for strong matches that don't have outreach yet
+function autoGenerateOutreach() {
+  try {
+    const unsentMatches = db.prepare(`
+      SELECT m.id as match_id, m.score, m.reasons,
+             l.id as listing_id, l.name as listing_name, l.city, l.state, l.asking_price, l.revenue, l.industry, l.description, l.url,
+             i.id as investor_id, i.firm_name, i.contact_name, i.contact_email, i.industries as inv_ind, i.locations as inv_loc
+      FROM matches m
+      JOIN listings l ON l.id = m.listing_id
+      JOIN investors i ON i.id = m.investor_id
+      LEFT JOIN outreach o ON o.match_id = m.id
+      WHERE m.score >= 50 AND o.id IS NULL AND l.status = 'new'
+      ORDER BY m.score DESC
+      LIMIT 20
+    `).all();
+
+    let generated = 0;
+    for (const m of unsentMatches) {
+      const fn = (m.contact_name || '').split(' ')[0] || 'there';
+      const loc = [m.city, m.state].filter(Boolean).join(', ');
+      const price = m.asking_price ? '$' + Number(m.asking_price).toLocaleString() : 'undisclosed';
+      const rev = m.revenue ? '$' + Number(m.revenue).toLocaleString() : 'undisclosed';
+      const reasons = (m.reasons || '').split(';').map(r => r.trim()).filter(Boolean);
+      const rl = reasons[0] || 'Matches your criteria';
+
+      const subj = (m.industry || 'Business') + ' opportunity in ' + (loc || 'your target market') + ' — ' + price;
+      const body = 'Hi ' + fn + ',\n\nA ' + (m.industry || 'business') + ' listing just came across my desk that fits your criteria at ' + m.firm_name + '.\n\n' +
+        m.listing_name + '\nLocation: ' + (loc || 'See listing') + '\nAsking: ' + price + '\nRevenue: ' + rev + '\n\nWhy this fits: ' + rl + '.' +
+        (m.score >= 60 ? ' Scored ' + m.score + '/100 against your profile.' : '') + '\n\n' +
+        (m.description ? m.description.substring(0, 200) + (m.description.length > 200 ? '...' : '') : '') +
+        '\n\nWant the full details? I can send the complete listing package.\n\nBest,\nDealMatcher';
+
+      try {
+        db.prepare('INSERT INTO outreach (match_id, listing_id, investor_id, email_to, subject, body, status) VALUES (?, ?, ?, ?, ?, ?, ?)')
+          .run(m.match_id, m.listing_id, m.investor_id, m.contact_email || '', subj, body, 'draft');
+        generated++;
+      } catch (e) { /* duplicate */ }
+    }
+    if (generated > 0) console.log('[AUTO-OUTREACH] Generated', generated, 'new outreach drafts');
+    return generated;
+  } catch (e) {
+    console.error('[AUTO-OUTREACH] Error:', e.message);
+    return 0;
+  }
+}
+
+// Daily matching + outreach cron
 const schedule = process.env.CRON_SCHEDULE || '0 7 * * *';
 cron.schedule(schedule, async () => {
-  console.log('[CRON] Running daily match');
+  console.log('[CRON] Running daily match + outreach');
   try {
     runMatchingForAll();
+    autoGenerateOutreach();
     console.log('[CRON] Done.');
   } catch (e) {
     console.error('[CRON] Failed:', e.message);
