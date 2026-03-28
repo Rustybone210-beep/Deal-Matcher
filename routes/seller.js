@@ -3,7 +3,7 @@ const router = express.Router();
 const { db } = require('../db/database');
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
-const J_EMAIL = 'fields@dealmatcherapp.com';
+const J_EMAIL = process.env.REPORT_EMAIL || 'fields@dealmatcherapp.com';
 
 // POST /api/seller/submit — broker/seller submits a new listing
 router.post('/submit', async (req, res) => {

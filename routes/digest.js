@@ -89,7 +89,7 @@ async function sendDigestForAll() {
       });
 
       // Log the digest
-      db.prepare('INSERT INTO digest_log (investor_id, listings_sent) VALUES (?, ?)').run(inv.id, matches.length);
+      db.prepare('INSERT INTO digest_log (investor_id, total_matches) VALUES (?, ?)').run(inv.id, matches.length);
       sent++;
       console.log('[DIGEST] Sent to ' + inv.contact_name + ' (' + inv.contact_email + ') — ' + matches.length + ' matches');
     } catch (e) {

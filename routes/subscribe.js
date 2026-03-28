@@ -8,7 +8,7 @@ const { runMatchingForAll } = require('../matcher/engine');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const SUBS_FILE = path.join(__dirname, '..', 'data', 'subscribers.json');
-const J_EMAIL = 'fields@dealmatcherapp.com';
+const J_EMAIL = process.env.REPORT_EMAIL || 'fields@dealmatcherapp.com';
 
 function loadSubs() {
   try {

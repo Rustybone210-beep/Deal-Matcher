@@ -120,8 +120,8 @@ router.post('/interested', requirePortalAuth, async (req, res) => {
     const existingMatch = db.prepare('SELECT id FROM matches WHERE listing_id = ? AND investor_id = ?').get(listing_id, investor_id);
     if (existingMatch) {
       try {
-        db.prepare('INSERT INTO outreach (match_id, investor_id, listing_id, teaser_text, status) VALUES (?, ?, ?, ?, ?)')
-          .run(existingMatch.id, investor_id, listing_id, investor.contact_name + ' expressed interest in ' + listing.name, 'interested');
+        db.prepare('INSERT INTO outreach (match_id, investor_id, listing_id, subject, body, status) VALUES (?, ?, ?, ?, ?, ?)')
+          .run(existingMatch.id, investor_id, listing_id, 'Interest: ' + listing.name, investor.contact_name + ' expressed interest in ' + listing.name, 'interested');
       } catch (e) {}
     }
 
